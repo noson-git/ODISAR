@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --gold: #C6A15B;
+    --maroon: #5B1F24;
+    --stone: #D8C5A3;
+    --parchment: #F1E5CC;
+    --bronze: #49372A;
+    --charcoal: #251D18;
+    --sage: #65745B;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #1a1411;
+    color: #F1E5CC;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .font-heading {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.02em;
+  }
+
+  .font-subheading {
+    font-family: 'Cormorant Garamond', serif;
+  }
+
+  .font-odia {
+    font-family: 'Noto Serif Oriya', serif;
+  }
+}
+
+/* Custom Glassmorphism & Heritage Elements */
+.glass-panel {
+  background: rgba(37, 29, 24, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(198, 161, 91, 0.22);
+}
+
+.glass-panel-light {
+  background: rgba(241, 229, 204, 0.08);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(216, 197, 163, 0.2);
+}
+
+.glass-panel-maroon {
+  background: rgba(91, 31, 36, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(198, 161, 91, 0.35);
+}
+
+.glass-card-interactive {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-interactive:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 161, 91, 0.5);
+  box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 15px rgba(198, 161, 91, 0.15);
+}
+
+/* Custom Scrollbar for maps & tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1e1713;
+}
+::-webkit-scrollbar-thumb {
+  background: #49372A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #C6A15B;
+}
+
+/* Leaflet container polish */
+.leaflet-container {
+  background-color: #1a1512 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.leaflet-popup-content-wrapper {
+  background: #251D18 !important;
+  color: #F1E5CC !important;
+  border: 1px solid #C6A15B !important;
+  border-radius: 6px !important;
+}
+.leaflet-popup-tip {
+  background: #251D18 !important;
+  border: 1px solid #C6A15B !important;
+}

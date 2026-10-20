@@ -1,0 +1,6 @@
+{
+  "name": "Project Khetra-AI (କ୍ଷେତ୍ର AI)",
+  "description": "Institutional Asset Intelligence & Heritage GIS Platform for Odisha - Mapping, Document Digitization, Field Verification & Records Governance",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

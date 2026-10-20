@@ -1,0 +1,1591 @@
+# PROJECT KHETRA-AI (କ୍ଷେତ୍ର AI)
+## Complete Master Build Prompt — OSFIC 2026 | Startup Odisha
+### Heritage-Inspired GIS, Institutional Asset Intelligence, Document Digitization & Field Verification Platform
+
+## ROLE AND OBJECTIVE
+
+Act as a senior full-stack software engineer, GIS architect, product designer, database engineer, security specialist, accessibility expert, and startup product strategist.
+
+Build **PROJECT KHETRA-AI (କ୍ଷେତ୍ର AI)** as a polished, functional, full-stack demonstration platform for managing geographically dispersed assets belonging to religious institutions and endowments in Odisha.
+
+This project is intended for demonstration in the OSFIC 2026 / Startup Odisha innovation context. It addresses the challenge of fragmented institutional asset information by bringing geographic asset discovery, property records, historical documents, field verification, administrative review, and reporting into one connected platform.
+
+The finished product must combine:
+
+- A visually memorable, heritage-inspired landing page.
+- A separate, fully functional GIS asset explorer.
+- A unified and persistent asset registry.
+- Institution-independent geographic filtering.
+- Field verification and discrepancy tracking.
+- Historical document digitization and human-reviewed OCR.
+- Secure administration and record approval.
+- Real database-driven statistics and downloadable reports.
+- A complete footer, clear navigation, and responsible-use notices.
+- A polished, guided demonstration suitable for judges and stakeholders.
+
+**Important product principle:** Khetra-AI must feel like a real software product, not a generic dashboard covered in temple decorations. Its design, features, data, and demonstrations must all support the same practical workflow: find an asset, inspect its records, collect evidence, review changes, and maintain a traceable history.
+
+---
+
+# 1. PROJECT SETUP AND IMPLEMENTATION STRATEGY
+
+This is a fresh project restart. Build a clean, coherent application rather than treating the work as a small redesign of the previous interface.
+
+First inspect the workspace and development environment.
+
+If useful source code or a working project already exists, inspect it before modifying anything. Preserve valuable functionality and avoid unnecessary rewrites.
+
+If the workspace is empty, create the required project structure, configuration, backend, frontend, database initialization, dependencies, and documentation.
+
+Before implementation:
+
+1. Identify the available runtime, frameworks, build tools, and supported backend capabilities.
+2. Define the frontend/backend architecture.
+3. Plan the database entities and relationships.
+4. Create a prioritized implementation plan.
+5. Build the core application in stages.
+6. Run the available tests and correct functional problems.
+
+Do not produce only a static frontend when a working backend is required. If the environment cannot run a particular backend or processing dependency, provide the genuine source and configuration where appropriate and clearly document what cannot run in that environment.
+
+Never pretend that an unconfigured integration is working.
+
+## Preferred technology stack
+
+Use the following architecture where supported by the environment:
+
+**Frontend**
+- React with TypeScript.
+- A well-organized component-based design.
+- Leaflet.js for GIS.
+- Responsive layouts for desktop, tablet, and mobile.
+- Accessible controls and predictable application state.
+
+**Backend**
+- Python FastAPI.
+- REST API endpoints.
+- SQLite persistent storage using `khetra.db`.
+- A modular structure separating API routes, business logic, database models, authorization, GIS utilities, document processing, and exports.
+
+**Document processing**
+- OpenCV for image enhancement.
+- Tesseract 5 for OCR.
+- English and Odia language support, with Hindi where the relevant language data is installed.
+
+**Geospatial data**
+- Leaflet for interactive maps.
+- GeoJSON for geographic features.
+- WGS84 coordinates.
+- A clear path toward a spatial database such as PostgreSQL/PostGIS if the deployment later requires it.
+
+Preserve the actual working stack if the environment or existing project differs. Do not replace a working component without a concrete reason.
+
+Keep dependencies reasonable. Use environment variables for secrets, provider configuration, and other sensitive settings.
+
+---
+
+# 2. PRODUCT IDENTITY AND VISUAL DESIGN
+
+## 2.1 Brand
+
+Product name:
+
+**PROJECT KHETRA-AI**
+
+Odia identity:
+
+**କ୍ଷେତ୍ର AI**
+
+Descriptor:
+
+**Institutional Asset Intelligence**
+
+Tagline:
+
+**Mapping Heritage. Organizing Assets. Enabling Responsible Verification.**
+
+Hero headline:
+
+**Every Asset. One Trusted View.**
+
+Supporting statement:
+
+“Bringing institutional lands, historical records, and field verification together through intelligent digital asset management.”
+
+The brand should communicate cultural preservation, geographic awareness, responsible administration, and modern technology.
+
+Do not imply that the application is an official government portal or has an official institutional endorsement.
+
+## 2.2 Color palette
+
+Use this established palette consistently:
+
+- Antique gold: `#C6A15B`
+- Deep maroon: `#5B1F24`
+- Temple stone: `#D8C5A3`
+- Aged parchment: `#F1E5CC`
+- Dark bronze: `#49372A`
+- Charcoal brown: `#251D18`
+- Muted sage: `#65745B`
+
+Use warm ivory, sandstone, parchment, dark maroon, charcoal, and restrained gold accents.
+
+Gold should be used for important highlights and accents rather than for every heading and button.
+
+Ensure sufficient text contrast. Do not sacrifice readability for the appearance of the interface.
+
+## 2.3 Typography
+
+Use an elegant display font such as Cinzel or Cormorant Garamond for major headings.
+
+Use Inter or Source Sans 3 for body text, controls, tables, and forms.
+
+Use Noto Serif Oriya or an appropriate Unicode-compatible Odia font for Odia text.
+
+Provide sensible fallback fonts. If a font service is unavailable, the application should remain readable.
+
+## 2.4 Design direction
+
+Create a premium visual identity inspired by:
+
+- Odisha's Kalinga temple architecture.
+- Intricate sandstone carvings.
+- Traditional architectural geometry.
+- Palm-leaf manuscripts and historical records.
+- Stone inscriptions and archival materials.
+- Modern geographic information systems.
+
+The final look should combine an architectural editorial website with a refined heritage-tech product interface.
+
+Avoid generic SaaS dashboard templates, excessive gradients, cartoonish temples, neon colors, oversized empty cards, unnecessary animation, and random decorative icons.
+
+---
+
+# 3. GLASSMORPHISM AND VISUAL POLISH
+
+Use **subtle, controlled glassmorphism** to elevate the interface.
+
+Suitable effects include:
+
+- Semi-transparent warm-white panels.
+- Dark translucent panels over photographic backgrounds.
+- Backdrop blur.
+- Fine borders with low-opacity gold or white.
+- Soft, restrained shadows.
+- Refined rounded corners.
+- Gentle hover transitions.
+- Small gold accents.
+
+Apply these effects selectively to:
+
+- The navigation bar where appropriate.
+- The landing-page hero text panel.
+- Feature cards over image backgrounds.
+- Product showcase cards.
+- Guided-tour panels.
+- Selected call-to-action elements.
+- Small floating information panels where appropriate.
+
+Do not make all components translucent. Data tables, dense forms, map controls, document review tools, and administrative workflows should use solid, high-contrast surfaces.
+
+Do not overuse blur or transparency to the point that content becomes difficult to read.
+
+Use a consistent border-radius system, spacing scale, typography hierarchy, icon style, and button system across the application.
+
+Implement reusable design tokens rather than styling every page independently.
+
+---
+
+# 4. HIGH-QUALITY CINEMATIC TEMPLE IMAGERY
+
+The application should have a distinctive visual identity driven by carefully composed architectural imagery.
+
+Use original AI-generated artwork where image generation is available. Otherwise, use suitable, legally usable images and wire them into the application as locally hosted assets where practical.
+
+Do not invent image paths or insert broken remote URLs.
+
+## 4.1 Hero background
+
+Create an original, cinematic landscape composition inspired by Odisha's Kalinga temple architecture.
+
+Visual direction:
+
+- Monumental sandstone temple architecture.
+- Intricate stone carvings.
+- Warm early-morning sunlight.
+- Subtle atmospheric mist.
+- Deep maroon and antique-gold tones.
+- Realistic stone texture.
+- Sophisticated architectural photography blended with premium cinematic concept art.
+- A strong composition with sufficient low-detail space for text.
+- Wide desktop aspect ratio, preferably around 16:9 or wider.
+
+Place the headline and calls to action in a readable area. Apply a carefully balanced dark or warm overlay.
+
+The artwork should look elegant, realistic, culturally respectful, and premium—not like a fantasy castle or an unrelated South Indian temple.
+
+## 4.2 Heritage preservation background
+
+Create a complementary image inspired by carved temple stonework, archival documents, traditional manuscript textures, and warm preservation-room lighting.
+
+Use it behind a section about historical documents and cultural preservation.
+
+## 4.3 Closing call-to-action background
+
+Use a darker architectural composition with subtle temple illumination and generous space for the final headline and buttons.
+
+## 4.4 Image handling
+
+- Generate original artwork through available image-generation capabilities where supported.
+- Store assets in a sensible structure such as `public/images/`, or follow the framework's existing asset conventions.
+- Optimize assets for web delivery.
+- Use responsive image positioning on mobile and desktop.
+- Use meaningful alternative text for informative images.
+- Avoid unnecessary background downloads and oversized image payloads.
+- Provide a graceful fallback if an optional image fails to load.
+- Treat generated artwork as illustrative; do not describe it as documentary evidence or a verified photograph of an institutional property.
+
+The public landing page may use cinematic temple visuals, but the actual GIS map belongs on its dedicated application page.
+
+---
+
+# 5. NAVIGATION AND APPLICATION STRUCTURE
+
+Build a clear site-wide navigation system.
+
+Brand area:
+
+- Khetra-AI mark.
+- PROJECT KHETRA-AI.
+- `କ୍ଷେତ୍ର AI`.
+- Short descriptor.
+
+Primary navigation:
+
+- Home.
+- Platform Features.
+- How It Works.
+- Field Verification.
+- Historical Records.
+- About the Project.
+
+Primary actions:
+
+- Explore GIS Map.
+- Admin Login.
+
+The navigation must support desktop and mobile, use accessible menu controls, and provide clear active states.
+
+Use the following suggested page structure, adapting routes to the framework:
+
+- `/` — Public landing page.
+- `/explore` or `/map` — Full GIS asset explorer.
+- `/properties` — Public asset listing.
+- `/properties/:id` — Permitted asset details.
+- `/field-verification` — Field-verification information or authorized workflow.
+- `/records` — Public approved records and document index.
+- `/about` — Project information.
+- `/admin/login` — Administrator login.
+- `/admin` — Protected administration dashboard.
+- `/admin/assets` — Asset management.
+- `/admin/documents` — Document and OCR management.
+- `/admin/verification` — Verification queue.
+- `/admin/reports` — Administrative reporting.
+
+Do not create duplicate routes if equivalent routes already exist.
+
+Every visible navigation item must lead to a real page or a real section. Remove dead links and empty destinations.
+
+Public routes and protected routes must be clearly separated.
+
+---
+
+# 6. COMPLETE LANDING PAGE — NO LIVE GIS PREVIEW
+
+The landing page must be substantial, visually rich, and informative, but not bloated or repetitive.
+
+**Critical rule: Do not embed a live GIS registry, interactive asset map, live parcel layer, or live registry preview on the landing page.**
+
+The actual GIS must be available through a separate route accessed from a working **Explore GIS Map** button.
+
+Do not lazy-load or mount a hidden GIS map behind the landing page. Initialize the actual map when the visitor opens the dedicated GIS page.
+
+## Section 1 — Cinematic hero
+
+Use the generated architectural background and restrained glassmorphism.
+
+Headline:
+
+**Every Asset. One Trusted View.**
+
+Supporting copy:
+
+“Khetra-AI brings institutional asset records, geographic discovery, historical documentation, and field verification into one connected digital platform.”
+
+Primary CTA: **Explore GIS Map**
+
+Secondary CTA: **Discover How It Works**
+
+Include a small trust statement:
+
+“Built for organized records, responsible digitization, and reviewable verification workflows.”
+
+The hero should quickly communicate the problem and solution.
+
+## Section 2 — Capability highlights
+
+Display four concise highlights:
+
+- Unified Asset Registry.
+- Geographic Asset Discovery.
+- Historical Document Digitization.
+- Field Verification.
+
+Use tasteful icons and one-sentence descriptions.
+
+## Section 3 — The challenge
+
+Heading:
+
+**When Records Are Fragmented, Visibility Is Lost.**
+
+Explain how institutional assets and historical records may be spread across different districts, documents, registers, and disconnected formats.
+
+Create three visually distinct cards:
+
+**Scattered Records**
+
+Asset data may be distributed across separate registers, documents, and files.
+
+**Limited Geographic Visibility**
+
+Finding an asset across multiple geographic jurisdictions can require manual effort.
+
+**Difficult Verification**
+
+Comparing historical information with current observations can be time-consuming and difficult to track.
+
+Use simple illustrations of separate records being organized into one coherent system.
+
+Do not claim every institution has the same challenges or invent numerical measures of the problem.
+
+## Section 4 — Heritage meets intelligence
+
+Heading:
+
+**Where Heritage Meets Intelligence.**
+
+Supporting copy:
+
+“Connecting institutional asset records, historical documents, and field verification through a unified digital platform.”
+
+Present three image-led cards:
+
+**Discover Assets**
+
+Organize and find assets through institutional and geographic search.
+
+**Preserve Records**
+
+Digitize historical documents and connect them to related asset records.
+
+**Verify in the Field**
+
+Record observations, document discrepancies, and submit proposed changes for review.
+
+Use architectural imagery, refined glass panels, clear descriptions, and working navigation to relevant pages.
+
+Do not include an interactive GIS preview in this section.
+
+## Section 5 — Platform capabilities
+
+Show cards for:
+
+- Unified Asset Registry.
+- Geographic Asset Search.
+- Parcel and Record Linking.
+- Field Verification.
+- Historical Document OCR.
+- Record Reconciliation.
+- Review and Publication.
+- Administrative Reporting.
+- Audit Trail and Change History.
+- Downloadable Asset Reports.
+
+Every implemented feature card should navigate to its real section or route.
+
+If a feature is not yet implemented, label it accurately as a planned capability. Do not simulate functional software merely to fill the landing page.
+
+## Section 6 — How it works
+
+Heading:
+
+**From Discovery to a Reviewable Record.**
+
+Present five steps:
+
+1. **Discover** — Select an institution and locate an asset through geographic filters or search.
+2. **Inspect** — Review the asset profile, location, recorded information, and linked documents.
+3. **Verify** — Submit structured field observations or proposed record corrections.
+4. **Review** — Authorized staff inspect the submitted evidence and proposed changes.
+5. **Maintain** — Approve eligible updates, preserve change history, and generate current reports.
+
+Use a refined horizontal timeline on desktop and vertical timeline on mobile.
+
+## Section 7 — Field verification
+
+Heading:
+
+**Bring Field Evidence Back to the Record.**
+
+Illustrate the genuine field-verification process using a polished interface illustration or screenshot of the implemented module.
+
+Explain the use of authorized GPS capture, photographs where supported, observations, discrepancy reporting, and human review.
+
+CTA: **Explore Field Verification**
+
+Do not simulate actual GPS collection or successful field submissions when those capabilities are not implemented.
+
+## Section 8 — Historical records
+
+Heading:
+
+**Preserve the Past. Make Records Easier to Review.**
+
+Show a visually appealing comparison of:
+
+- Original scanned document.
+- Enhanced image.
+- Proposed OCR-extracted fields.
+- Human correction and review interface.
+
+Use clearly labelled illustrative documents in the public landing page.
+
+Explain the process:
+
+**Upload → Enhance → Extract → Verify → Link to Asset → Review**
+
+CTA: **Explore Historical Records**
+
+## Section 9 — Trust and data quality
+
+Heading:
+
+**Every Record Needs Context.**
+
+Explain how Khetra-AI distinguishes:
+
+- Original source documents.
+- OCR-proposed information.
+- Human corrections.
+- Field observations.
+- Reviewed records.
+- Published records.
+
+Where implemented, display a record-completeness indicator based on actual populated fields. Explain the score and never confuse completeness with verified ownership.
+
+Mention duplicate warnings, inconsistent values, and missing-field alerts as data-quality assistance.
+
+These checks are prompts for authorized human review, not automatic legal judgments.
+
+## Section 10 — Institutional and geographic scope
+
+Heading:
+
+**One Institution Can Have Assets Across Multiple Districts.**
+
+Introduce the two demonstration institutions:
+
+- Lingaraj Temple — Bhubaneswar.
+- Shree Jagannath Temple — Puri.
+
+Explain the importance of keeping institution selection separate from district, tahasil, and mouza filters.
+
+Use a polished architectural or abstract geographic illustration instead of a live GIS embed.
+
+Clearly label any illustrative locations or geographic coverage graphics. Do not present the example holdings as verified official institutional assets.
+
+CTA: **Explore the GIS Platform**
+
+## Section 11 — Reporting and administrative insights
+
+Heading:
+
+**Turn Organized Records into Useful Reports.**
+
+Introduce possible reports:
+
+- Assets by institution.
+- Assets by district and tahasil.
+- Assets awaiting verification.
+- Documents awaiting review.
+- OCR records requiring correction.
+- Drafts awaiting approval.
+- Published record inventory.
+- Reported discrepancies awaiting investigation.
+
+Explain that operational reports use stored data and appropriate access controls.
+
+Do not display fake statewide totals, fabricated financial savings, or unsupported performance improvements.
+
+## Section 12 — Stakeholder benefits
+
+Heading:
+
+**Designed for the People Who Manage and Verify Assets.**
+
+Create four cards:
+
+**Institutional Authorities**
+
+Maintain a centralized inventory and review record updates.
+
+**Field Teams**
+
+Capture structured observations associated with the correct asset.
+
+**Administrative Teams**
+
+Find records by institution or geographic jurisdiction and produce useful reports.
+
+**Records Teams**
+
+Preserve source documents and connect historical information with digitized records.
+
+Describe these as intended benefits rather than proven outcomes.
+
+## Section 13 — Interactive product tour
+
+Heading:
+
+**Experience Khetra-AI in Three Steps.**
+
+Create a lightweight guided tour, not a live map preview.
+
+Step 1 — **Find an Asset:** Guide the user to the actual GIS route.
+
+Step 2 — **Inspect Its Record:** Guide the user to a permitted sample asset profile.
+
+Step 3 — **Follow the Review Process:** Explain how an observation or document correction enters the authorized review workflow.
+
+Provide a **Start Guided Tour** button.
+
+A tour card may use screenshots or static illustrations, but must not masquerade as a functioning live registry.
+
+When the user enters the actual GIS page, they can use the real map.
+
+## Section 14 — Optional planning calculator
+
+If time permits after the core application works, add a small interactive calculator that allows visitors to enter:
+
+- Number of asset records.
+- Percentage of records already digitized.
+- Estimated manual-search time per record.
+- Number of records processed per month.
+
+Calculate clearly labelled illustrative estimates from user-provided assumptions. Explain the formula.
+
+Do not claim validated productivity improvements or guaranteed savings.
+
+Keep this feature optional and do not let it delay the core GIS, database, authentication, and download implementation.
+
+## Section 15 — FAQs
+
+Create an accessible accordion covering:
+
+1. What is Khetra-AI?
+2. Which assets can it manage?
+3. Can one institution have assets in multiple districts?
+4. How does field verification work?
+5. Can historical documents be digitized?
+6. Does OCR establish legal ownership?
+7. Are the demonstrated parcel records official?
+8. Can more institutions be added in the future?
+
+Provide concise and accurate answers.
+
+## Section 16 — Final call to action
+
+Use a dark, cinematic temple background with a subtle antique-gold accent and readable glass panel.
+
+Headline:
+
+**Preserve the Record. Understand the Location. Improve the Workflow.**
+
+Supporting text:
+
+“Explore a connected approach to institutional asset discovery, historic record preservation, and responsible field verification.”
+
+Primary CTA: **Explore GIS Map**
+
+Secondary CTA: **View Platform Features**
+
+## Section 17 — Complete premium footer
+
+Create a polished, responsive footer with a deep-maroon or charcoal background, antique-gold separators, warm text, and restrained architectural motifs.
+
+### Brand column
+
+**PROJECT KHETRA-AI**
+
+`କ୍ଷେତ୍ର AI`
+
+“Mapping Heritage. Organizing Assets. Enabling Responsible Verification.”
+
+Short description explaining that the platform demonstrates how GIS, digitized documents, and field verification can help organize institutional assets.
+
+### Explore column
+
+- Home.
+- Platform Features.
+- How It Works.
+- Explore GIS Map.
+- Public Properties.
+
+### Platform column
+
+- Asset Registry.
+- Field Verification.
+- Historical Records.
+- Reports and Insights.
+- Administration Login.
+
+Protect administrator routes normally.
+
+### Project column
+
+- About the Project.
+- FAQs.
+- Demonstration Data Policy.
+- Responsible Use.
+
+Link each item to an existing page or section. Do not create dead links.
+
+### Demonstration disclaimer
+
+Display the following in readable text:
+
+“Demonstration platform only. Sample property records, documents, geographic locations, and illustrative parcel boundaries are not verified official records and must not be relied on for legal, ownership, survey, or administrative decisions.”
+
+### Bottom bar
+
+Include:
+
+- Dynamic copyright year.
+- PROJECT KHETRA-AI.
+- A visible “Demonstration Platform” label.
+- Actual privacy and responsible-use notices.
+- A working **Back to Top** action.
+
+Do not invent contact details, support emails, social profiles, customer references, or institutional endorsements.
+
+The footer must be readable on mobile, free from horizontal overflow, and consistent with the rest of the interface.
+
+---
+
+# 7. CORE GIS APPLICATION — BUILD IT AS A SEPARATE PAGE
+
+The GIS system is a central product capability and must not be reduced to a decorative landing-page graphic.
+
+Create a dedicated, functional GIS explorer.
+
+## 7.1 Institutions
+
+Initially configure:
+
+1. **Lingaraj Temple — Bhubaneswar**
+2. **Shree Jagannath Temple — Puri**
+
+The application must support the possibility of assets located in different districts from their associated institution.
+
+Use geographic examples such as:
+
+### Lingaraj Temple
+
+- Khordha District: Bhubaneswar Tahasil, including Old Town and Kapileswar.
+- Khordha District: Jatani Tahasil, including Janla.
+- Puri District: Pipili Tahasil, including Teisipur.
+
+### Shree Jagannath Temple
+
+- Puri District: Puri Sadar, including Balukhanda and Kundheibenta.
+- Khordha District: Jatani, including Khurda Road, and Bhubaneswar, including Nayapalli.
+- Cuttack District: Cuttack Sadar, including Bidanasi.
+
+These are demonstration examples, not verified official holdings.
+
+## 7.2 Independent selectors
+
+Keep institution selection strictly independent from geographic filtering.
+
+The interface must support:
+
+**Institution → District → Tahasil → Mouza/Village → Parcel**
+
+The institution can own or administer assets spread across different districts.
+
+Requirements:
+
+- Selecting an institution updates the institution context.
+- Selecting a district filters available geographic jurisdictions and matching assets.
+- Selecting a tahasil filters mouzas.
+- Selecting a mouza filters its available parcels where data exists.
+- Changing a parent geographic selection clears invalid dependent selections.
+- Changing the selected institution must not silently force the geographic filters to the institution's home city.
+- All displayed asset counts must correspond to the current filters.
+
+## 7.3 Basemaps
+
+Use Leaflet with:
+
+- Satellite imagery.
+- Street map.
+- Satellite with labels where supported.
+
+Prefer a suitable, correctly attributed provider such as Esri World Imagery for satellite imagery and OpenStreetMap for street mapping, subject to provider requirements.
+
+Requirements:
+
+- Preserve correct attribution.
+- Show the data or imagery source and date when available.
+- Provide a sensible fallback when a tile provider fails.
+- Restrict provider keys where necessary.
+- Maintain usable parcel outlines above satellite imagery.
+- Provide adjustable polygon-fill opacity from 0% to 100%.
+- Avoid claiming imagery is live or uniformly recent.
+- Keep the map functional when an optional imagery provider is unavailable.
+
+Satellite imagery does not establish legal ownership, official boundaries, or encroachment.
+
+## 7.4 Asset search and parcel selection
+
+Support search by:
+
+- Asset ID.
+- Institution.
+- District.
+- Tahasil.
+- Mouza or village.
+- Khata number.
+- Plot number.
+- Asset type where appropriate.
+
+Allow the user to:
+
+- Select a parcel from the map.
+- Open its correct record.
+- Select a record from a list.
+- Navigate from a record back to its map feature.
+- Clear selections.
+- Switch between map and list views.
+- Inspect the current institutional and geographic context.
+- Select multiple records where useful.
+
+Make the controls responsive and convenient for desktop and mobile users.
+
+## 7.5 Geometry
+
+Where editing is supported, allow authorized users to draw or edit illustrative parcel polygons.
+
+- Validate geometry before saving.
+- Store valid GeoJSON using WGS84 coordinates.
+- Maintain stable feature IDs.
+- Link features to the correct asset records.
+- Label geometry-derived area as an estimate.
+- Preserve recorded area and original units separately.
+
+Never treat geometry-derived area as an official survey measurement.
+
+---
+
+# 8. ASSET REGISTRY AND RECORD MANAGEMENT
+
+Support the following asset types:
+
+- Land or parcel.
+- Building or structure.
+- Other institutional asset.
+
+Use stable record IDs and persistent backend storage.
+
+## Asset fields
+
+Include relevant fields such as:
+
+- Unique asset ID.
+- Institution.
+- Asset type.
+- District.
+- Tahasil.
+- Mouza or village.
+- Khata number.
+- Plot number.
+- Land classification or kisam.
+- Recorded area.
+- Original area unit.
+- Normalized area where conversion is reliable.
+- GIS geometry.
+- Geometry source.
+- Record date.
+- Linked historical documents.
+- Verification status.
+- Review and publication status.
+- Creation and update timestamps.
+- Provenance and notes.
+
+Do not fill missing fields with invented values.
+
+## Asset operations
+
+Authorized users should be able to:
+
+- Create draft assets.
+- View asset details.
+- Edit authorized fields.
+- Archive and restore records.
+- Link documents.
+- View verification history.
+- Submit corrections for review.
+- Review related observations.
+- View permitted changes and audit history.
+
+Make changes persistent after refresh and application restart.
+
+## Asset profile
+
+Provide a useful asset detail page or panel with sections for:
+
+- Overview.
+- Geographic Location.
+- Recorded Details.
+- Linked Documents.
+- Field Observations.
+- Verification History.
+- Review Status.
+
+Show a record-completeness indicator only if it is calculated from actual field presence. Explain that completeness is not legal verification.
+
+---
+
+# 9. FIELD VERIFICATION AND CHANGE MONITORING
+
+Implement a real field-verification workflow.
+
+Field observations should support:
+
+- Linked asset ID.
+- Institution.
+- Observation timestamp.
+- GPS coordinates when permitted and available.
+- Location accuracy when available.
+- Field officer or submitter reference.
+- Photographs when supported.
+- Notes.
+- Discrepancy category.
+- Relation to the existing property record.
+- Verification status.
+- Reviewer comments.
+- Review history.
+
+Use statuses such as:
+
+- Not Verified.
+- Verification Pending.
+- Verified.
+- Discrepancy Reported.
+- Needs Further Review.
+
+Support authorized submission and review of observations.
+
+Preserve original observations and maintain an audit trail of corrections.
+
+Reported changes or potential encroachment concerns must be labelled:
+
+**“Reported concern — not legally determined.”**
+
+Do not use satellite imagery or unverified observations to make legal ownership decisions.
+
+Use fictional cases for demonstrating sensitive scenarios. Do not associate allegations with identifiable real individuals or properties.
+
+Do not claim offline capability unless it is implemented and tested.
+
+---
+
+# 10. HISTORICAL DOCUMENTS AND MULTILINGUAL OCR
+
+Create an administrative tool named:
+
+**Upload & Extract Land Information**
+
+Implement this workflow:
+
+**Upload → Validate → Enhance Image → Extract Text → Review Fields → Link to Property → Submit for Review → Approve → Publish**
+
+## Supported files
+
+Where configured, support:
+
+- PDF.
+- JPG and JPEG.
+- PNG.
+- Multipage scanned PDFs.
+
+Validate file type, size, page count, and content. Protect uploads against malicious content and unsafe file paths.
+
+## Image processing
+
+Use OpenCV where installed and configured.
+
+Support suitable processing such as:
+
+- Grayscale conversion.
+- CLAHE contrast enhancement.
+- Bilateral denoising.
+- Rotation correction.
+- Deskewing.
+- Suitable thresholding or resizing.
+
+Preserve the original file and store enhanced images separately.
+
+## OCR
+
+Use Tesseract 5 when available.
+
+Support English (`eng`) and Odia (`ori` where the installed Tesseract language data uses that code), with Hindi (`hin`) where configured.
+
+Check actual engine and language-data availability. If a dependency is missing, display a clear configuration message.
+
+Never simulate a successful OCR result when processing has not run.
+
+## Extraction fields
+
+Where legible, extract:
+
+- Institution or deity name.
+- District.
+- Tahasil.
+- Mouza or village.
+- Khata number.
+- Plot number.
+- Land classification.
+- Area and original unit.
+- Record date or year.
+- Document type.
+- Reference number.
+
+Store OCR output as a proposal requiring verification.
+
+## Human verification
+
+Display the original document alongside editable extracted fields.
+
+Where available:
+
+- Show page numbers.
+- Show OCR uncertainty or confidence.
+- Highlight fields requiring attention.
+- Allow authorized correction.
+- Preserve the original extracted output.
+- Record corrections and review history.
+
+Never invent illegible information. Use explicit values such as “Illegible,” “Not detected,” and “Needs manual review.”
+
+Preserve original units and text. If an area conversion is valid, store the normalized value separately with the conversion method documented.
+
+## Privacy
+
+Protect private tenant details, Aadhaar numbers, phone numbers, and internal litigation notes.
+
+Do not expose unpublished original documents through public endpoints. Review redacted copies before publication. Never rely solely on automated redaction for sensitive documents.
+
+---
+
+# 11. ADMIN LOGIN, ROLES, AND SECURITY
+
+Create a secure administration interface with its own clear navigation.
+
+Preferred login route: `/admin/login`, if compatible with the chosen framework.
+
+## Authentication requirements
+
+- Authenticate on the server.
+- Hash passwords with an appropriate password-hashing algorithm.
+- Never store plaintext passwords.
+- Use secure sessions and appropriately configured cookies.
+- Enforce server-side authorization on protected routes and APIs.
+- Implement appropriate login rate limiting.
+- Apply CSRF protection where suitable for the chosen authentication architecture.
+- Validate requests on the backend.
+- Prevent information leakage through error messages and logs.
+- Never expose secrets, password hashes, or internal storage paths.
+- Provide a documented, secure initial administrator provisioning process.
+- Do not ship hardcoded production credentials.
+
+## Roles
+
+**Administrator**
+- Manage users and roles.
+- Manage asset records.
+- Manage documents and versions.
+- Review and publish records.
+- Review field observations.
+- Access audit logs and system diagnostics.
+
+**Reviewer**
+- Review asset submissions.
+- Correct permitted fields.
+- Review OCR output.
+- Review field observations.
+- Approve or return submissions for correction.
+- Add review notes.
+
+**Data Entry Operator**
+- Create draft asset records.
+- Upload documents.
+- Run configured OCR.
+- Edit permitted draft fields.
+- Submit records for review.
+
+Permissions must be enforced by backend authorization logic, not by hiding UI buttons.
+
+## Record workflow
+
+**Draft → Needs Review → Approved → Published**
+
+Support rejection or return-for-correction where appropriate.
+
+- Draft records stay private.
+- Submission does not automatically publish records.
+- Only authorized reviewers can make review decisions.
+- Only permitted roles can publish.
+- Changes to published information must follow an appropriate review workflow.
+- Preserve useful previous versions or change history.
+- Public APIs must return only approved, published, redacted data.
+
+## Audit log
+
+Track important actions, including:
+
+- Record creation and updates.
+- Archival and restoration.
+- Document upload and replacement.
+- OCR correction.
+- Review decisions.
+- Publication changes.
+- Field observation updates.
+- User and role changes.
+
+Record the actor, action, target record, timestamp, and relevant change summary.
+
+Do not log sensitive credentials.
+
+---
+
+# 12. DOWNLOADS AND EXPORTS — MUST ACTUALLY WORK
+
+A download button is not complete simply because it looks clickable.
+
+Implement real file-generation and download behavior for applicable features.
+
+Inspect and test every download control, including:
+
+- CSV asset export.
+- PDF reports.
+- Filtered administrative reports.
+- Approved document downloads.
+- OCR result exports where provided.
+- Any other file downloads introduced by the application.
+
+Do not add download buttons without a working file source or genuine generation workflow.
+
+## 12.1 CSV export
+
+Generate a valid CSV using real database records and current authorized filters.
+
+Include appropriate column headers and escape special characters correctly.
+
+Use suitable UTF-8 encoding, preserving Odia and other supported text.
+
+Use meaningful filenames, such as:
+
+`khetra-assets-YYYY-MM-DD.csv`
+
+For larger datasets, use a backend export endpoint.
+
+Validate the output so the file contains actual CSV data rather than an HTML error page renamed with a `.csv` extension.
+
+## 12.2 PDF export
+
+Generate a real PDF using an appropriate library or genuine backend-generated report.
+
+Include useful report titles, generation dates, filters, and relevant data.
+
+Use appropriate filenames and the correct MIME type.
+
+Verify that the output opens as a valid PDF.
+
+Never rename HTML or CSV content to `.pdf`.
+
+## 12.3 Document downloads
+
+Fetch the actual stored document or permitted file resource.
+
+Enforce authorization on the server.
+
+Unpublished documents and sensitive records must remain inaccessible to unauthorized users.
+
+Use the correct content type and filename. Handle missing files and unauthorized access gracefully.
+
+## 12.4 Frontend download behavior
+
+Use the correct mechanism for each file type.
+
+For browser-generated files, use appropriate Blob-based downloading and release temporary object URLs when no longer needed.
+
+For backend-generated files, use the actual server response or a valid protected file endpoint.
+
+Handle asynchronous operations correctly and prevent accidental duplicate requests when appropriate.
+
+## 12.5 Honest feedback
+
+Each download must provide a real loading state and clear error feedback.
+
+Show success only when the relevant file-generation and download operation has succeeded sufficiently for the implementation.
+
+If an operation fails:
+
+- Display a useful error.
+- Allow retry when appropriate.
+- Keep the page usable.
+- Record technical details in developer logs without exposing secrets.
+
+Never display a success message when the backend request failed.
+
+After implementation, test the actual downloaded files and confirm their formats, content, filenames, and access permissions.
+
+---
+
+# 13. ADMINISTRATIVE DASHBOARD AND REPORTS
+
+Design a polished, readable administration interface consistent with the overall visual identity.
+
+Include suitable navigation, status indicators, search, filtering, accessible tables, and clear action buttons.
+
+## Dashboard metrics
+
+Calculate statistics from actual database queries, including:
+
+- Total assets.
+- Asset counts by institution.
+- Asset counts by district.
+- Asset counts by type.
+- Records awaiting verification.
+- Records with reported discrepancies.
+- Documents awaiting OCR review.
+- Records awaiting approval.
+- Records awaiting publication.
+
+Clearly label demonstration data where applicable.
+
+Use proper empty states and loading states. Never hardcode official-looking totals.
+
+## Verification queue
+
+Provide a centralized queue for:
+
+- Field observations awaiting review.
+- Reported discrepancies.
+- Documents awaiting OCR correction.
+- Asset records awaiting approval.
+- Records awaiting publication.
+
+Include relevant filters, timestamps, record identifiers, and statuses.
+
+## Reporting and export
+
+Allow authorized users to filter, view, and download appropriate reports in CSV or PDF format where implemented.
+
+Restrict exports according to role and publication status.
+
+Do not include sensitive private information in public downloads.
+
+## Duplicate and consistency checks
+
+Where practical, flag:
+
+- Duplicate asset IDs.
+- Possible duplicates with matching property identifiers.
+- Missing geographic fields.
+- Missing document links.
+- Conflicting recorded area values.
+- Missing geometry when a location is required.
+
+Treat these as warnings for human review. Do not automatically merge or delete records.
+
+## QR code for asset profiles
+
+Where feasible, generate a QR code for a permitted asset profile.
+
+It must use a real application URL and must not contain credentials or private tokens.
+
+The destination must enforce the same access permissions as the normal page.
+
+## Notifications
+
+Where implemented, persist notifications for useful events such as:
+
+- Submission awaiting review.
+- Record returned for correction.
+- OCR extraction requiring attention.
+- Field observation awaiting review.
+- Record approved for publication.
+
+Do not simulate email or SMS delivery unless a real service has been configured and accepted the operation.
+
+---
+
+# 14. DATABASE AND API ARCHITECTURE
+
+Use persistent storage. Do not rely on frontend arrays or local component state for the authoritative dataset.
+
+Use appropriately related models for:
+
+- Institutions.
+- Geographic jurisdictions.
+- Assets and parcels.
+- Geometries or geographic feature references.
+- Documents and document versions.
+- OCR jobs and extraction results.
+- Field-verification observations.
+- Review and publication history.
+- User accounts and roles.
+- Audit events.
+- Notifications where implemented.
+
+Use stable identifiers, database constraints, appropriate relationships, and transactions for operations requiring multiple changes.
+
+Design consistent APIs for:
+
+- Institutions.
+- Geographic hierarchy.
+- Asset search and CRUD.
+- Map feature retrieval.
+- Document upload and retrieval.
+- OCR processing and review.
+- Field observation submission.
+- Record review and publication.
+- Dashboard metrics.
+- Report generation and downloads.
+- Administrative user management.
+- Audit history.
+
+Follow the conventions of the selected framework.
+
+Every endpoint must validate input and enforce authorization.
+
+Public APIs must expose only appropriate, approved, published, redacted information.
+
+Use pagination and efficient queries where appropriate.
+
+Do not claim a save, upload, OCR operation, export, or publication succeeded unless the actual operation succeeded.
+
+---
+
+# 15. REMOVE ALL HUNDI AND FINANCIAL COLLECTION FUNCTIONALITY
+
+**Hundi functionality is excluded from this project. Do not implement, retain, recreate, reference, or redesign any Hundi feature.**
+
+There must be no Hundi-related:
+
+- Pages.
+- Widgets.
+- Ledger.
+- Financial collection history.
+- Collection amounts.
+- Date filters.
+- Charts.
+- Dashboard cards.
+- Forms.
+- APIs.
+- Database models or migrations created solely for the feature.
+- Seed data.
+- Navigation items.
+- Permission descriptions.
+- Documentation.
+- Tests or acceptance criteria.
+
+Do not replace it with a donation system, payment gateway, or financial collection ledger.
+
+Keep the product focused on GIS asset management, property records, field verification, historical documentation, review, and reporting.
+
+Do not destructively delete unrelated data structures. Avoid creating unnecessary financial-related schema in the new application.
+
+---
+
+# 16. DEMONSTRATION DATA, TRANSPARENCY, AND RESPONSIBLE USE
+
+Verified institutional property records and authoritative parcel boundaries have not been provided.
+
+Use consistent fictional sample records and illustrative parcel geometries.
+
+Clearly label demonstration data in the GIS, property pages, landing-page illustrations, dashboard, reports, and sample documents.
+
+Keep the following concepts distinct:
+
+- Actual institution-location markers.
+- Illustrative asset locations.
+- Illustrative parcel boundaries.
+- Recorded area values.
+- Geometry-calculated estimates.
+- Original document text.
+- OCR-proposed values.
+- Human-reviewed fields.
+- Approved or published data.
+
+Do not fabricate official records, legal titles, survey measurements, official ownership claims, external integrations, awards, endorsements, productivity gains, customer counts, or statewide deployment results.
+
+For reported discrepancies or potential encroachment, use fictional examples labelled **“Reported concern — not legally determined.”**
+
+Do not associate accusations with identifiable real individuals or private properties.
+
+Display this notice prominently on the public portal and in relevant views:
+
+“Demonstration Platform: This project illustrates how religious institutions could digitise, map, preserve, and manage their assets. Property records, parcel boundaries, documents, and other sample information are illustrative and must not be used for legal, ownership, survey, or official administrative decisions.”
+
+---
+
+# 17. ACCESSIBILITY, PERFORMANCE, AND RESPONSIVENESS
+
+Support desktop, laptop, tablet, and mobile.
+
+Implement:
+
+- Semantic headings and landmarks.
+- Accessible form labels.
+- Keyboard navigation.
+- Clear focus indicators.
+- Sufficient color contrast.
+- Responsive navigation.
+- Readable tables.
+- Appropriately sized buttons.
+- Meaningful image alt text.
+- Reduced-motion support.
+- Clear loading and empty states.
+- Helpful errors and retry options.
+
+Optimize the landing page for performance.
+
+- Do not initialize the GIS map on the landing page.
+- Lazy-load noncritical imagery.
+- Optimize image formats and sizes.
+- Avoid unnecessarily large assets.
+- Avoid excessive animation or heavy frontend dependencies.
+- Load the GIS only on its dedicated page.
+- Avoid horizontal overflow.
+- Ensure backgrounds and glass panels display correctly on small screens.
+
+The administration and data-review interfaces must prioritize readability and functionality over decorative visual effects.
+
+---
+
+# 18. SECURITY AND CREDIBILITY REQUIREMENTS
+
+- Never commit secrets or production credentials.
+- Use environment variables where appropriate.
+- Restrict private document access on the backend.
+- Validate uploads.
+- Prevent unauthorized record access and edits.
+- Preserve audit history.
+- Enforce publication permissions.
+- Avoid revealing sensitive information in logs or errors.
+- Do not invent completed security audits or compliance certifications.
+- Do not claim integration with official government databases without a working authorized integration.
+- Do not treat satellite imagery as evidence of legal ownership.
+- Do not treat OCR as a source of legal conclusions.
+
+Clearly document the distinction between a demonstration product and a future production deployment.
+
+---
+
+# 19. REQUIRED IMPLEMENTATION ORDER
+
+Implement the project in a sequence that produces a credible working result instead of many unfinished pages.
+
+## Phase 1 — Project foundation
+
+- Establish the project structure.
+- Configure the frontend and backend.
+- Create the persistent database and initial schema.
+- Implement reusable design tokens and shared components.
+- Configure safe development and production environment variables.
+- Add clearly labelled demonstration data.
+
+## Phase 2 — Premium visual experience
+
+- Generate or integrate appropriate temple imagery.
+- Build the full landing page with all main sections.
+- Implement restrained glassmorphism.
+- Create the navigation and responsive footer.
+- Ensure all CTAs use valid routes.
+- Keep the live GIS completely off the landing page.
+
+## Phase 3 — Core GIS and asset registry
+
+- Create the dedicated GIS page.
+- Implement institution and geographic selectors.
+- Implement map layers and fallback behavior.
+- Implement asset search and parcel selection.
+- Connect map features to persistent asset records.
+- Implement create, edit, archive, and restore workflows.
+
+## Phase 4 — Secure administration
+
+- Implement login and sessions.
+- Enforce backend role permissions.
+- Implement the dashboard with real database statistics.
+- Implement the review and publication workflow.
+- Add audit history.
+- Add a centralized verification and review queue.
+
+## Phase 5 — Field verification
+
+- Implement observation submission.
+- Add location capture where available.
+- Support photographs and notes where configured.
+- Link observations to the correct asset.
+- Implement review statuses and traceable decisions.
+
+## Phase 6 — Historical records and OCR
+
+- Implement secure upload.
+- Add image enhancement and OCR where dependencies are available.
+- Add human correction and source-page references.
+- Connect documents and proposed fields to asset records.
+- Enforce privacy, review, and publication rules.
+
+## Phase 7 — Downloadable reports
+
+- Fix and test CSV generation.
+- Implement real PDF exports where required.
+- Implement protected document downloads.
+- Validate downloaded file content and formats.
+- Fix every visible broken download action.
+
+## Phase 8 — Judge-ready polish
+
+- Add a guided demonstration.
+- Add data-quality indicators.
+- Add QR asset profiles where feasible.
+- Add notifications and useful report filters where implemented.
+- Refine the landing page, footer, mobile layout, and accessibility.
+- Test complete end-to-end workflows.
+
+If the task becomes too large for a single build iteration, finish and verify each phase rather than falsely claiming that all phases are complete.
+
+---
+
+# 20. FINAL ACCEPTANCE CHECKLIST
+
+The application should not be considered complete until the following checks have been performed.
+
+### Landing page and visual quality
+
+- Premium heritage-inspired visual system applied consistently.
+- High-quality temple artwork loads correctly.
+- Glassmorphism is subtle and readable.
+- The page contains the complete planned structure.
+- The live GIS registry preview is absent.
+- CTAs navigate to real pages.
+- The footer is complete and functional.
+- Desktop and mobile layouts work correctly.
+
+### GIS and asset records
+
+- Institution selection is independent of geographic filters.
+- Geographic selectors work in the correct hierarchy.
+- Map selection opens the right record.
+- Asset records can navigate back to their map features.
+- Records persist after refresh and restart.
+- Geometry is validated.
+- Recorded and calculated area values remain distinct.
+- Basemap failure does not break the application.
+
+### Authentication and data protection
+
+- Protected routes require authentication.
+- Backend permissions are enforced.
+- Unpublished data is not publicly accessible.
+- Sensitive document information is protected.
+- Review and publication rules work correctly.
+- Audit entries are recorded for important changes.
+
+### OCR and field verification
+
+- Files are validated.
+- Originals remain preserved.
+- OCR runs only when genuinely configured.
+- Errors are displayed honestly.
+- Extracted fields can be corrected by authorized users.
+- Observations link to the correct assets.
+- All published data follows the appropriate review process.
+
+### Downloads and reporting
+
+- Every download button has been inspected.
+- CSV files contain valid CSV data.
+- PDF downloads open as real PDFs where implemented.
+- Document downloads return actual authorized files.
+- Failed downloads show useful errors instead of fake success.
+- Reports reflect the active filters and authorized dataset.
+- No private fields leak through exports.
+
+### Credibility
+
+- Demonstration data is clearly labelled.
+- No invented official statistics or endorsements are used.
+- No unimplemented integration is represented as working.
+- No Hundi or financial collection feature exists.
+- Test results and incomplete features are documented honestly.
+
+---
+
+# 21. FINAL DELIVERY REPORT
+
+At the end, provide a concise but useful report containing:
+
+1. The application structure and technologies actually used.
+2. The important pages and features implemented.
+3. Database entities and migrations.
+4. How to install dependencies and run the application.
+5. Required environment variables and configuration.
+6. OCR setup, including required Tesseract language data.
+7. Download functionality implemented and the tests performed on actual files.
+8. Tests run, with actual results.
+9. Remaining limitations and features that are only planned.
+10. A short judge-demo sequence.
+
+Include the actual commands appropriate to the generated project.
+
+Do not claim that a feature, test, download, or integration works unless it was genuinely implemented or verified.
+
+---
+
+# FINAL BUILD INSTRUCTION
+
+Build PROJECT KHETRA-AI as a coherent, premium, heritage-inspired GIS asset intelligence platform for the OSFIC 2026 demonstration.
+
+Prioritize the following user journey:
+
+1. A visitor understands the product through the cinematic landing page.
+2. They open the dedicated GIS explorer through a working navigation button.
+3. They select an institution and locate a geographically dispersed sample asset.
+4. They inspect the asset record and linked documentation.
+5. An authorized user submits a field observation or document correction.
+6. A reviewer examines the evidence and handles the record through the review workflow.
+7. The system preserves its change history and generates a real report or authorized download.
+
+Use original high-quality temple artwork, controlled glassmorphism, a complete footer, responsive layouts, real backend persistence, secure authorization, working downloads, and consistent sample data.
+
+**Do not embed the live GIS on the landing page. Do not add Hundi functionality. Do not fake working features. Do not delete useful existing code without a reason.**
+
+Start with the project foundation, build in phases, test the critical workflows, and deliver a genuinely functional product whose visual quality and practical utility support the same clear purpose.
