@@ -65,6 +65,39 @@
   box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
 }
 
+/* High-Contrast Luxury Parchment & Editorial Architectural Surfaces */
+.surface-parchment {
+  background-color: #FAF6EF;
+  color: #1F1915;
+  border: 1px solid #E2D7C3;
+  box-shadow: 0 4px 20px -2px rgba(26, 20, 17, 0.08);
+}
+
+.surface-parchment-card {
+  background-color: #F4EFE6;
+  color: #251D18;
+  border: 1px solid #D8C5A3;
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.surface-parchment-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -4px rgba(73, 55, 42, 0.12);
+  border-color: #C6A15B;
+}
+
+.surface-dark-card {
+  background-color: #1F1814;
+  border: 1px solid rgba(198, 161, 91, 0.22);
+  box-shadow: 0 6px 20px -2px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.surface-dark-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(198, 161, 91, 0.5);
+  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.6);
+}
+
 .glass-card-interactive {
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }

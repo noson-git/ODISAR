@@ -16,13 +16,13 @@ export const AboutPage: React.FC<AboutPageProps> = ({ onNavigateToGis }) => {
   return (
     <div className="w-full min-h-[calc(100vh-80px)] bg-[#1A1411] text-[#F1E5CC] py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto space-y-12">
-        {/* Header with ODISAR logo */}
+        {/* Header with ODISAR emblem */}
         <div className="border-b border-[#C6A15B]/20 pb-8 text-center space-y-4">
-          <div className="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-[#5B1F24] via-[#251D18] to-[#C6A15B]/30 p-2 border-2 border-[#C6A15B]/50 shadow-xl flex items-center justify-center">
+          <div className="mx-auto h-20 w-auto flex items-center justify-center">
             <img
-              src={IMAGES.logoTransparent}
+              src={IMAGES.emblemTransparent}
               alt="ODISAR Official Emblem"
-              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+              className="h-20 w-auto object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)]"
             />
           </div>
 

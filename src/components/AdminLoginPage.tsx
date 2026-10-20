@@ -67,19 +67,19 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#C6A15B_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
       <div className="relative z-10 w-full max-w-lg space-y-8">
-        {/* Seal & Department Title Header with ODISAR Logo */}
+        {/* Seal & Institutional Header with ODISAR Emblem */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#5B1F24] via-[#38201b] to-[#C6A15B]/30 border-2 border-[#C6A15B]/60 shadow-2xl p-2 mx-auto">
+          <div className="inline-flex items-center justify-center h-20 w-auto mx-auto">
             <img
-              src={IMAGES.logoTransparent}
+              src={IMAGES.emblemTransparent}
               alt="ODISAR Official Emblem"
-              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+              className="h-20 w-auto object-contain filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.7)]"
             />
           </div>
 
           <div>
             <span className="text-[11px] font-bold tracking-widest text-[#C6A15B] uppercase block">
-              Government of Odisha • Law &amp; Endowments Department
+              Institutional Asset Governance Portal
             </span>
             <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">
               ODISAR Administration Login
