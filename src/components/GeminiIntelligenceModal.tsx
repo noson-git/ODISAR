@@ -528,7 +528,7 @@ export const GeminiIntelligenceModal: React.FC<GeminiIntelligenceModalProps> = (
                         <span className="text-[#C6A15B] font-bold">Generated Artwork ({imgResult.size})</span>
                         <a
                           href={imgResult.imageUrl}
-                          download="khetra_heritage_visualization.png"
+                          download="odisar_heritage_visualization.png"
                           className="text-[#C6A15B] hover:underline flex items-center gap-1"
                         >
                           <Download className="w-3.5 h-3.5" />

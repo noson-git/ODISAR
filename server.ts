@@ -1,6 +1,7 @@
 /**
- * Project Khetra-AI Full-Stack Server
- * Express + SQLite (khetra.db) + Vite Middlewares + Gemini AI API
+ * ODISAR Full-Stack Server
+ * Odisha Digital Inventory & Spatial Asset Registry
+ * Express + SQLite (ODISAR Registry Database) + Vite Middlewares + Gemini AI API
  */
 
 import express from 'express';
@@ -587,7 +588,7 @@ async function startServer() {
       const dateStr = new Date().toISOString().split('T')[0];
 
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-      res.setHeader('Content-Disposition', `attachment; filename="khetra-assets-${dateStr}.csv"`);
+      res.setHeader('Content-Disposition', `attachment; filename="odisar-assets-${dateStr}.csv"`);
       res.send(csvContent);
     } catch (err: any) {
       res.status(500).json({ error: err.message });
@@ -676,11 +677,11 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`[Project Khetra-AI] Full-stack server running at http://0.0.0.0:${PORT}`);
+    console.log(`[ODISAR] Full-stack server running at http://0.0.0.0:${PORT}`);
   });
 }
 
 startServer().catch((err) => {
-  console.error('[Project Khetra-AI] Failed to start server:', err);
+  console.error('[ODISAR] Failed to start server:', err);
   process.exit(1);
 });

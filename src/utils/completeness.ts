@@ -1,5 +1,6 @@
 /**
- * Record Completeness & Data Quality Indicator for Project Khetra-AI
+ * Record Completeness & Data Quality Indicator for ODISAR
+ * Odisha Digital Inventory & Spatial Asset Registry
  *
  * NOTE: Completeness is an operational measure of field population and
  * documentation presence. It does NOT represent legal ownership or official title.

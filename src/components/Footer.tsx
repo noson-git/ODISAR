@@ -1,5 +1,6 @@
 import React from 'react';
-import { ArrowUp, ShieldCheck, MapPin, Database, Sparkles, Scale } from 'lucide-react';
+import { ArrowUp, ShieldCheck, Scale } from 'lucide-react';
+import { IMAGES } from '../assets/images';
 
 interface FooterProps {
   onNavigate: (view: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin') => void;
@@ -22,29 +23,29 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           {/* Brand Column (2 cols wide on desktop) */}
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded bg-[#5B1F24] border border-[#C6A15B] flex items-center justify-center text-[#C6A15B] font-bold shadow-md">
-                <svg className="w-5 h-5 text-[#C6A15B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L9 7H15L12 2Z" fill="#C6A15B" fillOpacity="0.3" />
-                  <path d="M7 7L5 12H19L17 7H7Z" />
-                  <path d="M4 12L3 21H21L20 12H4Z" />
-                </svg>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5B1F24] via-[#251D18] to-[#C6A15B]/30 p-1 border border-[#C6A15B]/60 flex items-center justify-center shadow-md">
+                <img
+                  src={IMAGES.logoTransparent}
+                  alt="ODISAR Logo"
+                  className="w-full h-full object-contain filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+                />
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-heading font-bold text-lg tracking-wider text-[#F1E5CC]">
-                  PROJECT KHETRA-AI
+                <span className="font-heading font-extrabold text-xl tracking-wider text-[#F1E5CC]">
+                  ODISAR
                 </span>
-                <span className="font-odia text-xs px-2 py-0.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/30 font-medium">
-                  କ୍ଷେତ୍ର AI
+                <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/30 font-semibold tracking-wider">
+                  GOVT. OF ODISHA
                 </span>
               </div>
             </div>
 
             <p className="text-sm font-subheading italic text-[#C6A15B] tracking-wide">
-              “Mapping Heritage. Organizing Assets. Enabling Responsible Verification.”
+              “Odisha Digital Inventory &amp; Spatial Asset Registry — Mapping Heritage. Organizing Assets. Enabling Responsible Verification.”
             </p>
 
-            <p className="text-xs text-[#D8C5A3]/75 leading-relaxed max-w-md">
-              Khetra-AI connects institutional land records, historical documents, and field verification into a unified GIS intelligence platform. Developed for the Odisha Startup &amp; Innovation context (OSFIC 2026), it empowers trusts and endowments to preserve ancient records, track field inspections, and resolve geographic fragmentation.
+            <p className="text-xs text-[#D8C5A3]/80 leading-relaxed max-w-md">
+              ODISAR connects institutional land records, historical documents, and field verification into a unified GIS intelligence platform. Developed for the Odisha Startup &amp; Innovation context (OSFIC 2026), it empowers trusts, endowments, and administrative authorities to preserve ancient records, track field inspections, and resolve geographic fragmentation.
             </p>
 
             <div className="flex items-center gap-2 pt-2">
@@ -168,7 +169,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
         {/* Bottom Bar */}
         <div className="mt-8 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#D8C5A3]/60">
           <div className="flex flex-wrap items-center gap-4">
-            <span>© {currentYear} PROJECT KHETRA-AI. All rights reserved.</span>
+            <span>© {currentYear} ODISAR — Odisha Digital Inventory &amp; Spatial Asset Registry. All rights reserved.</span>
             <span className="px-2 py-0.5 rounded bg-[#C6A15B]/15 text-[#C6A15B] border border-[#C6A15B]/30 text-[10px] uppercase font-bold tracking-wider">
               Demonstration Platform • OSFIC 2026
             </span>
@@ -178,7 +179,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
           <button
             onClick={scrollToTop}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#251D18] hover:bg-[#382b22] text-[#C6A15B] border border-[#C6A15B]/30 transition-all text-xs font-medium cursor-pointer"
-            aria-label="Scroll back to top of page"
+            aria-label="Scroll to top of page"
           >
             <span>Back to Top</span>
             <ArrowUp className="w-3.5 h-3.5" />

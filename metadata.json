@@ -1,6 +1,6 @@
 {
-  "name": "Project Khetra-AI (କ୍ଷେତ୍ର AI)",
-  "description": "Institutional Asset Intelligence & Heritage GIS Platform for Odisha - Mapping, Document Digitization, Field Verification & Records Governance",
+  "name": "ODISAR — Odisha Digital Inventory & Spatial Asset Registry",
+  "description": "Odisha Digital Inventory & Spatial Asset Registry — Heritage-Inspired GIS, Institutional Asset Intelligence, Document Digitization & Field Verification Platform for Odisha",
   "requestFramePermissions": ["geolocation"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

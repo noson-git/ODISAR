@@ -374,7 +374,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
                 <div className="p-3 rounded bg-[#251D18] border border-[#C6A15B]/20 flex items-center justify-between">
                   <div>
                     <span className="font-bold text-white block">Initial Cadastral Ingestion</span>
-                    <span className="text-[10px] text-[#D8C5A3]/60">System Initializer (khetra.db)</span>
+                    <span className="text-[10px] text-[#D8C5A3]/60">System Initializer (ODISAR Registry)</span>
                   </div>
                   <span className="text-[10px] text-[#C6A15B] font-mono">2026-10-15</span>
                 </div>
@@ -385,7 +385,7 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
 
         {/* Modal Footer */}
         <div className="bg-[#251D18] border-t border-[#C6A15B]/20 p-4 flex items-center justify-between text-xs text-[#D8C5A3]/60 shrink-0">
-          <span>Project Khetra-AI • Demonstration Record {asset.id}</span>
+          <span>ODISAR • Odisha Digital Inventory &amp; Spatial Asset Registry • Record {asset.id}</span>
           <button
             onClick={() => generateSingleAssetPdf(asset)}
             className="text-[#C6A15B] hover:text-white font-semibold flex items-center gap-1 cursor-pointer"

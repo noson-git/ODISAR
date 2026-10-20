@@ -1,5 +1,6 @@
 /**
- * GIS and geospatial calculations for Project Khetra-AI
+ * GIS and geospatial calculations for ODISAR
+ * Odisha Digital Inventory & Spatial Asset Registry
  * WGS84 coordinate helpers, polygon area calculation, and unit conversions
  */
 

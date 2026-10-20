@@ -4,12 +4,10 @@ import {
   Lock,
   User,
   ArrowRight,
-  CheckCircle2,
   AlertCircle,
-  Building2,
   KeyRound,
-  FileCheck,
 } from 'lucide-react';
+import { IMAGES } from '../assets/images';
 
 interface AdminLoginPageProps {
   onLogin: (role: string) => void;
@@ -20,7 +18,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
   const [officerId, setOfficerId] = useState('commissioner@endowments.odisha.gov.in');
   const [password, setPassword] = useState('••••••••••••');
   const [selectedRole, setSelectedRole] = useState('Administrator');
-  const [twoFactorCode, setTwoFactorCode] = useState('KHETRA-2026');
+  const [twoFactorCode, setTwoFactorCode] = useState('ODISAR-2026');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -46,19 +44,19 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
   const handleQuickDemoFill = (role: string) => {
     if (role === 'Administrator') {
       setOfficerId('commissioner@endowments.odisha.gov.in');
-      setPassword('KhetraAdmin#2026');
+      setPassword('OdisarAdmin#2026');
       setSelectedRole('Administrator');
-      setTwoFactorCode('KHETRA-ADMIN');
+      setTwoFactorCode('ODISAR-ADMIN');
     } else if (role === 'Reviewer') {
       setOfficerId('tahasil.officer.nayak@khordha.odisha.gov.in');
       setPassword('ReviewerPass#2026');
       setSelectedRole('Reviewer');
-      setTwoFactorCode('KHETRA-SURVEY');
+      setTwoFactorCode('ODISAR-SURVEY');
     } else {
-      setOfficerId('digitization.operator@khetra.ai');
+      setOfficerId('digitization.operator@odisar.gov.in');
       setPassword('DataEntryPass#2026');
       setSelectedRole('Data Entry Operator');
-      setTwoFactorCode('KHETRA-DEO');
+      setTwoFactorCode('ODISAR-DEO');
     }
     setError(null);
   };
@@ -69,12 +67,14 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
       <div className="absolute inset-0 opacity-15 pointer-events-none bg-[radial-gradient(#C6A15B_1px,transparent_1px)] [background-size:24px_24px]"></div>
 
       <div className="relative z-10 w-full max-w-lg space-y-8">
-        {/* Seal & Department Title Header */}
+        {/* Seal & Department Title Header with ODISAR Logo */}
         <div className="text-center space-y-3">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#5B1F24] via-[#38201b] to-[#C6A15B]/30 border border-[#C6A15B]/50 shadow-2xl p-0.5 mx-auto">
-            <div className="w-full h-full rounded-[14px] bg-[#251D18] flex items-center justify-center">
-              <ShieldCheck className="w-8 h-8 text-[#C6A15B]" />
-            </div>
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-[#5B1F24] via-[#38201b] to-[#C6A15B]/30 border-2 border-[#C6A15B]/60 shadow-2xl p-2 mx-auto">
+            <img
+              src={IMAGES.logoTransparent}
+              alt="ODISAR Official Emblem"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+            />
           </div>
 
           <div>
@@ -82,9 +82,12 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
               Government of Odisha • Law &amp; Endowments Department
             </span>
             <h1 className="font-heading text-2xl sm:text-3xl font-bold text-white tracking-wide mt-1">
-              Administration Login
+              ODISAR Administration Login
             </h1>
-            <p className="text-xs text-[#D8C5A3]/80 mt-1.5 font-sans max-w-sm mx-auto">
+            <p className="text-xs text-[#C6A15B] font-medium tracking-wide">
+              Odisha Digital Inventory &amp; Spatial Asset Registry
+            </p>
+            <p className="text-xs text-[#D8C5A3]/80 mt-1 font-sans max-w-sm mx-auto">
               Secure institutional access for Tahasil revenue officers, endowment commissioners, and cadastral survey auditors.
             </p>
           </div>
@@ -180,7 +183,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLogin, onNavig
               ) : (
                 <>
                   <ShieldCheck className="w-4 h-4 text-[#251D18]" />
-                  <span>Sign In to Administration Portal</span>
+                  <span>Sign In to ODISAR Administration</span>
                   <ArrowRight className="w-4 h-4 text-[#251D18]" />
                 </>
               )}

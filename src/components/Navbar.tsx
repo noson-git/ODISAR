@@ -2,28 +2,24 @@ import React, { useState } from 'react';
 import {
   Compass,
   FileText,
-  ShieldCheck,
   Building2,
   Menu,
   X,
   ChevronRight,
   Lock,
 } from 'lucide-react';
+import { IMAGES } from '../assets/images';
 
 interface NavbarProps {
-  currentView: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin';
-  onNavigate: (view: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin') => void;
+  currentView: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'admin' | 'about';
+  onNavigate: (view: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'admin' | 'about') => void;
   userRole?: string;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({
-  currentView,
-  onNavigate,
-  userRole = 'Administrator',
-}) => {
+export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate, userRole }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Exact 4 links required for the public header
+  // Exactly the 4 required public navigation items per specification
   const navItems = [
     { id: 'home' as const, label: 'Home', icon: Building2 },
     { id: 'gis' as const, label: 'Explore GIS', icon: Compass },
@@ -37,40 +33,37 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#18120e]/80 backdrop-blur-xl border-b border-[#C6A15B]/30 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.7)] transition-all">
+    <header className="sticky top-0 z-50 w-full bg-[#18120e]/85 backdrop-blur-xl border-b border-[#C6A15B]/30 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.7)] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
-          {/* Brand Logo & Title */}
+          {/* Brand Logo & Title with ODISAR identity */}
           <div
             className="flex items-center gap-3.5 cursor-pointer group"
             onClick={() => onNavigate('home')}
             role="button"
             tabIndex={0}
-            aria-label="Navigate to Project Khetra-AI Homepage"
+            aria-label="Navigate to ODISAR Homepage"
           >
-            <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-[#5B1F24] via-[#49372A] to-[#C6A15B]/40 p-0.5 border border-[#C6A15B]/50 flex items-center justify-center shadow-lg group-hover:border-[#C6A15B] transition-all">
-              <div className="w-full h-full rounded-[6px] bg-[#251D18] flex items-center justify-center text-[#C6A15B]">
-                {/* Traditional Kalinga Temple Spire Icon Symbol */}
-                <svg className="w-6 h-6 text-[#C6A15B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L9 7H15L12 2Z" fill="#C6A15B" fillOpacity="0.3" />
-                  <path d="M7 7L5 12H19L17 7H7Z" />
-                  <path d="M4 12L3 21H21L20 12H4Z" />
-                  <line x1="12" y1="2" x2="12" y2="22" strokeDasharray="2 2" />
-                </svg>
-              </div>
+            {/* ODISAR Logo image container with subtle gold highlight */}
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#5B1F24]/80 via-[#251D18] to-[#C6A15B]/20 p-1 border border-[#C6A15B]/50 flex items-center justify-center shadow-lg group-hover:border-[#C6A15B] group-hover:shadow-[0_0_15px_rgba(198,161,91,0.35)] transition-all overflow-hidden shrink-0">
+              <img
+                src={IMAGES.logoTransparent}
+                alt="ODISAR Logo"
+                className="w-full h-full object-contain filter drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
+              />
             </div>
 
             <div className="flex flex-col shrink-0">
               <div className="flex items-center gap-2">
-                <span className="font-heading font-bold text-base sm:text-lg tracking-wider text-[#F1E5CC] group-hover:text-white transition-colors whitespace-nowrap">
-                  PROJECT KHETRA-AI
+                <span className="font-heading font-extrabold text-lg sm:text-xl tracking-wider text-[#F1E5CC] group-hover:text-[#C6A15B] transition-colors whitespace-nowrap">
+                  ODISAR
                 </span>
-                <span className="font-odia text-xs px-2 py-0.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/30 font-medium whitespace-nowrap">
-                  କ୍ଷେତ୍ର AI
+                <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded bg-[#5B1F24]/90 text-[#F1E5CC] border border-[#C6A15B]/40 font-semibold tracking-wider whitespace-nowrap">
+                  GOVT. OF ODISHA
                 </span>
               </div>
-              <span className="text-[10px] sm:text-[11px] text-[#D8C5A3]/75 tracking-wider sm:tracking-widest uppercase font-medium whitespace-nowrap">
-                Institutional Asset Intelligence • OSFIC 2026
+              <span className="text-[10px] sm:text-[11px] text-[#D8C5A3]/85 tracking-wide sm:tracking-wider font-medium whitespace-nowrap">
+                Odisha Digital Inventory &amp; Spatial Asset Registry
               </span>
             </div>
           </div>
@@ -123,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="px-2.5 py-1.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/40 text-xs font-semibold flex items-center gap-1"
             >
               <Lock className="w-3 h-3 text-[#C6A15B]" />
-              <span>Admin</span>
+              <span>Login</span>
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}

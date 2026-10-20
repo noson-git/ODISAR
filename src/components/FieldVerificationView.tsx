@@ -312,7 +312,7 @@ export const FieldVerificationView: React.FC<FieldVerificationViewProps> = ({ on
                   Field Observations Registry
                 </h3>
                 <span className="text-xs text-[#D8C5A3]/70">
-                  {observations.length} Submissions • Audited in khetra.db
+                  {observations.length} Submissions • Audited in ODISAR Registry
                 </span>
               </div>
 

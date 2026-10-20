@@ -54,8 +54,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
 
   const faqs = [
     {
-      q: 'What is Project Khetra-AI?',
-      a: 'Khetra-AI is an institutional asset intelligence and heritage GIS demonstration platform designed for religious endowments in Odisha. It connects fragmented paper land records, scanned historical deeds, spatial parcel boundaries, and field verification observations into one reviewable system.',
+      q: 'What is ODISAR?',
+      a: 'ODISAR (Odisha Digital Inventory & Spatial Asset Registry) is an institutional asset intelligence and heritage GIS platform designed for endowments, religious trusts, and land administration in Odisha. It connects fragmented paper land records, scanned historical deeds, spatial parcel boundaries, and field verification observations into one reviewable system.',
     },
     {
       q: 'Which institutions and assets can it manage?',
@@ -63,7 +63,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
     },
     {
       q: 'Can one single institution have assets located in multiple districts?',
-      a: 'Yes, absolutely. A key innovation of Khetra-AI is strictly separating Institution context from Geographic filtering. For instance, Lingaraj Temple (headquartered in Bhubaneswar, Khordha) holds parcels in Khordha and Puri, while Shree Jagannath Temple (Puri) holds lands across Puri, Khordha, and Cuttack.',
+      a: 'Yes, absolutely. A key innovation of ODISAR is strictly separating Institution context from Geographic filtering. For instance, Lingaraj Temple (headquartered in Bhubaneswar, Khordha) holds parcels in Khordha and Puri, while Shree Jagannath Temple (Puri) holds lands across Puri, Khordha, and Cuttack.',
     },
     {
       q: 'How does the field verification process work?',
@@ -71,7 +71,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
     },
     {
       q: 'Can historical palm-leaf and archival settlement deeds be digitized?',
-      a: 'Yes. Khetra-AI features an "Upload & Extract Land Information" module supporting historical Record of Rights (1927 Sabik RoR, 1962 Tahasil registers) with image enhancement and human-reviewed multilingual OCR (Odia and English).',
+      a: 'Yes. ODISAR features an "Upload & Extract Land Information" module supporting historical Record of Rights (1927 Sabik RoR, 1962 Tahasil registers) with image enhancement and human-reviewed multilingual OCR (Odia and English).',
     },
     {
       q: 'Does OCR extraction establish legal ownership?',
@@ -106,21 +106,33 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
         </div>
 
         {/* Hero Glass Content Container */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 p-8 sm:p-12 rounded-3xl glass-panel-hero">
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-6 p-8 sm:p-12 rounded-3xl glass-panel-hero">
+          {/* Centered ODISAR Emblem */}
+          <div className="mx-auto w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br from-[#5B1F24]/90 via-[#251D18] to-[#C6A15B]/30 p-2.5 border-2 border-[#C6A15B]/60 shadow-[0_0_30px_rgba(198,161,91,0.35)] flex items-center justify-center animate-fade-in">
+            <img
+              src={IMAGES.logoTransparent}
+              alt="ODISAR Official Emblem"
+              className="w-full h-full object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.85)]"
+            />
+          </div>
+
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201814]/80 border border-[#C6A15B]/40 text-[#C6A15B] text-xs font-semibold tracking-wider uppercase backdrop-blur-md shadow-lg animate-fade-in">
             <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
             <span>OSFIC 2026 Innovation Showcase • Startup Odisha</span>
           </div>
 
-          <div className="space-y-4">
-            <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl tracking-tight text-white drop-shadow-md">
-              Every Asset. <span className="text-[#C6A15B]">One Trusted View.</span>
+          <div className="space-y-3">
+            <h1 className="font-heading font-black text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white drop-shadow-md">
+              ODISAR
             </h1>
-            <p className="font-odia text-xl sm:text-2xl text-[#D8C5A3] font-medium tracking-wide">
-              କ୍ଷେତ୍ର AI — ଐତିହ୍ୟ ସମ୍ପତ୍ତିର ଭୌଗୋଳିକ ପରିଚାଳନା
+            <p className="font-heading text-lg sm:text-2xl text-[#C6A15B] font-semibold tracking-wide">
+              Odisha Digital Inventory &amp; Spatial Asset Registry
             </p>
-            <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#F1E5CC]/90 leading-relaxed font-sans font-normal">
-              Bringing institutional lands, historical records, and field verification together through intelligent digital asset management.
+            <p className="font-odia text-base sm:text-lg text-[#D8C5A3] font-medium tracking-wide">
+              ଓଡ଼ିଶା ଡିଜିଟାଲ୍ ତାଲିକା ଏବଂ ସ୍ଥାନିକ ସମ୍ପତ୍ତି ରେଜିଷ୍ଟ୍ରି
+            </p>
+            <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#F1E5CC]/90 leading-relaxed font-sans font-normal pt-2">
+              Every Asset. One Trusted View. Bringing institutional lands, historical records, and field verification together through intelligent digital asset management.
             </p>
           </div>
 
@@ -1093,7 +1105,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
               Frequently Asked Questions
             </h2>
             <p className="text-xs text-[#D8C5A3]/80">
-              Clear answers regarding Project Khetra-AI, data governance, and demonstration scope.
+              Clear answers regarding ODISAR, data governance, and demonstration scope.
             </p>
           </div>
 

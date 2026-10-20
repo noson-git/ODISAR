@@ -1,5 +1,6 @@
 /**
- * Server-side Gemini AI Integrations for Project Khetra-AI
+ * Server-side Gemini AI Integrations for ODISAR
+ * Odisha Digital Inventory & Spatial Asset Registry
  *
  * Implements:
  * - Search Grounding (gemini-3.8-flash with googleSearch)

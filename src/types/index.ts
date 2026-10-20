@@ -1,5 +1,6 @@
 /**
- * TypeScript Data Models for Project Khetra-AI
+ * TypeScript Data Models for ODISAR
+ * Odisha Digital Inventory & Spatial Asset Registry
  */
 
 export interface Institution {

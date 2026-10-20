@@ -1,5 +1,5 @@
 /**
- * Persistent SQLite Database for Project Khetra-AI (khetra.db)
+ * Persistent SQLite Database for ODISAR (Odisha Digital Inventory & Spatial Asset Registry)
  * Uses Node 22 native node:sqlite DatabaseSync
  */
 
@@ -105,7 +105,7 @@ export function initDatabase() {
 }
 
 function seedDatabase() {
-  console.log('[Khetra-AI] Seeding dry-land verified demonstration dataset into khetra.db...');
+  console.log('[ODISAR] Seeding dry-land verified demonstration dataset into registry database...');
 
   // 1. Seed Institutions
   const insertInst = db.prepare(`
@@ -622,7 +622,7 @@ function seedDatabase() {
     now
   );
 
-  console.log('[Khetra-AI] Database initialized and seeded successfully with verified dry-land geometries.');
+  console.log('[ODISAR] Database initialized and seeded successfully with verified dry-land geometries.');
 }
 
 export { db };

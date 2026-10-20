@@ -109,7 +109,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-heading text-xs font-bold uppercase tracking-widest text-[#C6A15B]">
-                Administrative Governance Portal
+                ODISAR Governance Portal • Odisha Digital Inventory &amp; Spatial Asset Registry
               </span>
               <span className="text-[10px] bg-[#5B1F24] text-[#C6A15B] px-2 py-0.5 rounded border border-[#C6A15B]/30 font-bold">
                 Role: {userRole}
@@ -119,7 +119,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               Command &amp; Verification Dashboard
             </h1>
             <p className="text-xs text-[#D8C5A3]/80 mt-1 max-w-2xl font-sans">
-              Real-time database statistics from khetra.db, discrepancy review queue, and auditable governance decisions.
+              Real-time database statistics from ODISAR registry database, discrepancy review queue, and auditable governance decisions.
             </p>
           </div>
 
