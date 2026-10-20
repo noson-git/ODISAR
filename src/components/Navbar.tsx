@@ -1,52 +1,43 @@
 import React, { useState } from 'react';
 import {
-  MapPin,
+  Compass,
   FileText,
   ShieldCheck,
-  Compass,
+  Building2,
   Menu,
   X,
-  Sparkles,
   ChevronRight,
-  Database,
-  Building2,
+  Lock,
 } from 'lucide-react';
 
 interface NavbarProps {
   currentView: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin';
   onNavigate: (view: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin') => void;
-  onOpenAiModal?: () => void;
   userRole?: string;
-  onSwitchRole?: (role: string) => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   onNavigate,
-  onOpenAiModal,
   userRole = 'Administrator',
-  onSwitchRole,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  interface NavItem {
-    id: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about';
-    label: string;
-    icon: React.ComponentType<{ className?: string }>;
-    badge?: string;
-  }
-
-  const navItems: NavItem[] = [
-    { id: 'home', label: 'Home', icon: Building2 },
-    { id: 'gis', label: 'Explore GIS', icon: Compass, badge: 'Live Map' },
-    { id: 'properties', label: 'Asset Registry', icon: Database },
-    { id: 'field-verification', label: 'Field Verification', icon: MapPin },
-    { id: 'records', label: 'Historical Records', icon: FileText },
-    { id: 'about', label: 'About Project', icon: ShieldCheck },
+  // Exact 4 links required for the public header
+  const navItems = [
+    { id: 'home' as const, label: 'Home', icon: Building2 },
+    { id: 'gis' as const, label: 'Explore GIS', icon: Compass },
+    { id: 'records' as const, label: 'Historical Records', icon: FileText },
+    { id: 'admin' as const, label: 'Administration Login', icon: Lock },
   ];
 
+  const handleLinkClick = (id: 'home' | 'gis' | 'records' | 'admin') => {
+    onNavigate(id);
+    setMobileMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#1e1713]/90 backdrop-blur-md border-b border-[#C6A15B]/25">
+    <header className="sticky top-0 z-50 w-full bg-[#18120e]/80 backdrop-blur-xl border-b border-[#C6A15B]/30 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.7)] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           {/* Brand Logo & Title */}
@@ -78,87 +69,65 @@ export const Navbar: React.FC<NavbarProps> = ({
                   କ୍ଷେତ୍ର AI
                 </span>
               </div>
-              <span className="text-[10px] sm:text-[11px] text-[#D8C5A3]/70 tracking-wider sm:tracking-widest uppercase font-medium whitespace-nowrap">
+              <span className="text-[10px] sm:text-[11px] text-[#D8C5A3]/75 tracking-wider sm:tracking-widest uppercase font-medium whitespace-nowrap">
                 Institutional Asset Intelligence • OSFIC 2026
               </span>
             </div>
           </div>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1">
+          {/* Desktop Navigation Links — Strictly the 4 required public links */}
+          <nav className="hidden md:flex items-center gap-2">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = currentView === item.id;
+              const isAdmin = item.id === 'admin';
+
+              if (isAdmin) {
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleLinkClick(item.id)}
+                    className={`ml-2 px-4 py-2 rounded-lg text-xs font-semibold tracking-wider uppercase transition-all flex items-center gap-2 border shadow-sm ${
+                      isActive
+                        ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-md shadow-[#5B1F24]/30'
+                        : 'bg-[#201814]/90 text-[#F1E5CC] border-[#C6A15B]/40 hover:bg-[#5B1F24]/60 hover:border-[#C6A15B] hover:text-white'
+                    }`}
+                  >
+                    <Lock className="w-3.5 h-3.5 text-[#C6A15B]" />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              }
+
               return (
                 <button
                   key={item.id}
-                  onClick={() => onNavigate(item.id)}
-                  className={`px-3 py-2 rounded-md text-xs tracking-wider uppercase font-medium flex items-center gap-1.5 transition-all ${
+                  onClick={() => handleLinkClick(item.id)}
+                  className={`px-3.5 py-2 rounded-lg text-xs tracking-wider uppercase font-semibold flex items-center gap-2 transition-all ${
                     isActive
-                      ? 'bg-[#C6A15B]/20 text-[#F1E5CC] border border-[#C6A15B]/50 shadow-sm'
-                      : 'text-[#D8C5A3]/80 hover:text-white hover:bg-white/5'
+                      ? 'bg-[#C6A15B]/20 text-white border border-[#C6A15B]/60 shadow-[0_2px_10px_rgba(198,161,91,0.2)]'
+                      : 'text-[#D8C5A3] hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#C6A15B]' : 'text-[#D8C5A3]/60'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-[#C6A15B]' : 'text-[#D8C5A3]/70'}`} />
                   <span>{item.label}</span>
-                  {item.badge && (
-                    <span className="ml-1 text-[9px] px-1.5 py-0.2 rounded-full bg-[#5B1F24] text-[#C6A15B] font-semibold border border-[#C6A15B]/40">
-                      {item.badge}
-                    </span>
-                  )}
                 </button>
               );
             })}
           </nav>
 
-          {/* Action Buttons & AI Intelligence Trigger */}
-          <div className="hidden sm:flex items-center gap-2.5">
-            {onOpenAiModal && (
-              <button
-                onClick={onOpenAiModal}
-                className="px-3 py-2 rounded-md text-xs font-semibold bg-[#2e231c] hover:bg-[#382b22] text-[#D8C5A3] border border-[#C6A15B]/40 flex items-center gap-1.5 transition-all shadow-sm"
-                title="Grounding & Reasoning Copilot"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#C6A15B] animate-pulse" />
-                <span>Gemini Intelligence</span>
-              </button>
-            )}
-
-            <button
-              onClick={() => onNavigate('gis')}
-              className={`px-4 py-2 rounded-md text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-md ${
-                currentView === 'gis'
-                  ? 'bg-[#C6A15B] text-[#251D18]'
-                  : 'bg-gradient-to-r from-[#C6A15B] to-[#b89146] text-[#251D18] hover:brightness-110 active:scale-95'
-              }`}
-            >
-              <Compass className="w-4 h-4 text-[#251D18]" />
-              <span>Explore GIS Map</span>
-            </button>
-
-            <button
-              onClick={() => onNavigate('admin')}
-              className={`px-3 py-2 rounded-md text-xs font-medium uppercase tracking-wider transition-all border ${
-                currentView === 'admin'
-                  ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B]'
-                  : 'bg-[#251D18]/80 text-[#D8C5A3] border-[#C6A15B]/30 hover:border-[#C6A15B]/70'
-              }`}
-            >
-              Admin Portal
-            </button>
-          </div>
-
           {/* Mobile menu button */}
-          <div className="flex lg:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-2">
             <button
-              onClick={() => onNavigate('gis')}
-              className="px-3 py-1.5 rounded bg-[#C6A15B] text-[#251D18] text-xs font-bold"
+              onClick={() => handleLinkClick('admin')}
+              className="px-2.5 py-1.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/40 text-xs font-semibold flex items-center gap-1"
             >
-              GIS Map
+              <Lock className="w-3 h-3 text-[#C6A15B]" />
+              <span>Admin</span>
             </button>
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 rounded-md text-[#D8C5A3] hover:text-white hover:bg-white/5"
+              className="p-2 rounded-lg text-[#D8C5A3] hover:text-white hover:bg-white/5 border border-[#C6A15B]/20"
               aria-label="Toggle navigation menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -167,24 +136,27 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Drawer — Contains strictly the 4 required public links */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-[#251D18] border-b border-[#C6A15B]/30 px-4 pt-2 pb-6 space-y-1">
+        <div className="md:hidden bg-[#18120e]/95 backdrop-blur-2xl border-b border-[#C6A15B]/30 px-4 pt-3 pb-6 space-y-1.5 shadow-2xl">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentView === item.id;
+            const isAdmin = item.id === 'admin';
+
             return (
               <button
                 key={item.id}
-                onClick={() => {
-                  onNavigate(item.id);
-                  setMobileMenuOpen(false);
-                }}
-                className={`w-full text-left px-3 py-2.5 rounded-md text-sm font-medium flex items-center justify-between ${
-                  isActive ? 'bg-[#C6A15B]/20 text-[#F1E5CC] border border-[#C6A15B]/40' : 'text-[#D8C5A3]'
+                onClick={() => handleLinkClick(item.id)}
+                className={`w-full text-left px-3.5 py-3 rounded-lg text-sm font-semibold flex items-center justify-between transition-all ${
+                  isActive
+                    ? 'bg-[#C6A15B]/20 text-white border border-[#C6A15B]/50'
+                    : isAdmin
+                    ? 'bg-[#5B1F24]/50 text-[#C6A15B] border border-[#C6A15B]/30'
+                    : 'text-[#D8C5A3] hover:bg-white/5'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-3">
                   <Icon className="w-4 h-4 text-[#C6A15B]" />
                   <span>{item.label}</span>
                 </div>
@@ -192,30 +164,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             );
           })}
-
-          <div className="pt-4 border-t border-[#C6A15B]/20 flex flex-col gap-2">
-            {onOpenAiModal && (
-              <button
-                onClick={() => {
-                  onOpenAiModal();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full py-2.5 rounded bg-[#2e231c] text-[#D8C5A3] border border-[#C6A15B]/40 text-sm font-semibold flex items-center justify-center gap-2"
-              >
-                <Sparkles className="w-4 h-4 text-[#C6A15B]" />
-                <span>Open Gemini Intelligence</span>
-              </button>
-            )}
-            <button
-              onClick={() => {
-                onNavigate('admin');
-                setMobileMenuOpen(false);
-              }}
-              className="w-full py-2.5 rounded bg-[#5B1F24] text-[#F1E5CC] border border-[#C6A15B]/40 text-sm font-semibold flex items-center justify-center gap-2"
-            >
-              <span>Administrator Portal</span>
-            </button>
-          </div>
         </div>
       )}
     </header>

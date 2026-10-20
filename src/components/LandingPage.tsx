@@ -106,8 +106,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
         </div>
 
         {/* Hero Glass Content Container */}
-        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#251D18]/80 border border-[#C6A15B]/40 text-[#C6A15B] text-xs font-semibold tracking-wider uppercase backdrop-blur-md shadow-lg animate-fade-in">
+        <div className="relative z-10 max-w-4xl mx-auto text-center space-y-8 p-8 sm:p-12 rounded-3xl glass-panel-hero">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#201814]/80 border border-[#C6A15B]/40 text-[#C6A15B] text-xs font-semibold tracking-wider uppercase backdrop-blur-md shadow-lg animate-fade-in">
             <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
             <span>OSFIC 2026 Innovation Showcase • Startup Odisha</span>
           </div>
@@ -128,7 +128,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
             <button
               onClick={() => onNavigate('gis')}
-              className="w-full sm:w-auto px-8 py-4 rounded-md bg-gradient-to-r from-[#C6A15B] via-[#d4af65] to-[#C6A15B] text-[#251D18] font-bold text-sm uppercase tracking-wider shadow-xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2.5 group cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 rounded-xl bg-gradient-to-r from-[#C6A15B] via-[#d4af65] to-[#C6A15B] text-[#251D18] font-bold text-sm uppercase tracking-wider shadow-xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2.5 group cursor-pointer"
             >
               <Compass className="w-5 h-5 text-[#251D18] group-hover:rotate-45 transition-transform" />
               <span>Explore GIS Map</span>
@@ -137,14 +137,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
 
             <a
               href="#how-it-works"
-              className="w-full sm:w-auto px-7 py-4 rounded-md bg-[#251D18]/85 hover:bg-[#322720] text-[#F1E5CC] border border-[#C6A15B]/40 font-semibold text-sm tracking-wider backdrop-blur-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-4 rounded-xl bg-[#251D18]/85 hover:bg-[#322720] text-[#F1E5CC] border border-[#C6A15B]/40 font-semibold text-sm tracking-wider backdrop-blur-md transition-all flex items-center justify-center gap-2 cursor-pointer shadow-md"
             >
               <span>Discover How It Works</span>
             </a>
 
             <button
               onClick={() => setTourOpen(true)}
-              className="w-full sm:w-auto px-5 py-4 rounded-md bg-transparent hover:bg-white/5 text-[#D8C5A3] border border-[#D8C5A3]/30 text-xs font-medium uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
+              className="w-full sm:w-auto px-5 py-4 rounded-xl bg-transparent hover:bg-white/5 text-[#D8C5A3] border border-[#D8C5A3]/30 text-xs font-medium uppercase tracking-wider transition-all flex items-center justify-center gap-1.5"
             >
               <Eye className="w-4 h-4 text-[#C6A15B]" />
               <span>Guided Tour (3 Steps)</span>
@@ -163,7 +163,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
       {/* ========================================================= */}
       {/* SECTION 2: CAPABILITY HIGHLIGHTS                          */}
       {/* ========================================================= */}
-      <section className="py-12 bg-[#201814] border-y border-[#C6A15B]/20 px-4 sm:px-6 lg:px-8">
+      <section className="py-12 bg-[#1b1511]/90 border-y border-[#C6A15B]/20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             {
@@ -191,9 +191,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
             return (
               <div
                 key={idx}
-                className="p-5 rounded-lg bg-[#251D18]/90 border border-[#C6A15B]/25 hover:border-[#C6A15B]/60 transition-all space-y-2.5 shadow-sm"
+                className="p-6 rounded-2xl glass-panel glass-card-interactive space-y-3 shadow-md"
               >
-                <div className="w-10 h-10 rounded-md bg-[#5B1F24] border border-[#C6A15B]/40 flex items-center justify-center text-[#C6A15B]">
+                <div className="w-10 h-10 rounded-xl bg-[#5B1F24] border border-[#C6A15B]/40 flex items-center justify-center text-[#C6A15B] shadow-inner">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="font-heading text-sm font-bold text-[#F1E5CC] tracking-wide">
@@ -249,20 +249,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
             return (
               <div
                 key={i}
-                className="p-6 rounded-xl bg-gradient-to-b from-[#251D18] to-[#1c1511] border border-[#C6A15B]/25 hover:border-[#C6A15B]/50 transition-all space-y-4 shadow-md relative group"
+                className="p-6 rounded-2xl glass-panel glass-card-interactive space-y-4 shadow-lg relative group"
               >
                 <div className="flex items-center justify-between">
-                  <div className="w-10 h-10 rounded-lg bg-[#5B1F24] border border-[#C6A15B]/30 flex items-center justify-center text-[#C6A15B]">
+                  <div className="w-10 h-10 rounded-xl bg-[#5B1F24] border border-[#C6A15B]/30 flex items-center justify-center text-[#C6A15B] shadow-inner">
                     <Icon className="w-5 h-5" />
                   </div>
-                  <span className="text-[10px] uppercase font-bold text-[#C6A15B] bg-[#5B1F24]/60 px-2 py-0.5 rounded border border-[#C6A15B]/30">
+                  <span className="text-[10px] uppercase font-bold text-[#C6A15B] bg-[#5B1F24]/70 px-2 py-0.5 rounded border border-[#C6A15B]/40">
                     {card.tag}
                   </span>
                 </div>
                 <h3 className="font-heading text-lg font-bold text-white group-hover:text-[#C6A15B] transition-colors">
                   {card.title}
                 </h3>
-                <p className="text-xs text-[#D8C5A3]/80 leading-relaxed font-sans">
+                <p className="text-xs text-[#D8C5A3]/85 leading-relaxed font-sans">
                   {card.desc}
                 </p>
               </div>
@@ -274,7 +274,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
       {/* ========================================================= */}
       {/* SECTION 4: WHERE HERITAGE MEETS INTELLIGENCE              */}
       {/* ========================================================= */}
-      <section className="py-20 bg-[#1E1713] border-t border-[#C6A15B]/20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-[#17120e] border-t border-[#C6A15B]/20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-14">
           <div className="text-center space-y-3 max-w-2xl mx-auto">
             <span className="text-xs uppercase tracking-widest text-[#C6A15B] font-bold">
@@ -290,16 +290,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Card 1 */}
-            <div className="rounded-xl overflow-hidden bg-[#251D18] border border-[#C6A15B]/30 flex flex-col group shadow-lg">
+            <div className="rounded-2xl overflow-hidden glass-panel glass-card-interactive flex flex-col group shadow-xl">
               <div className="h-48 overflow-hidden relative">
                 <img
                   src={IMAGES.hero}
                   alt="Discover Assets"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#251D18] via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#201814] via-transparent to-transparent"></div>
                 <div className="absolute bottom-3 left-4">
-                  <span className="px-2.5 py-1 rounded bg-[#5B1F24] text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#5B1F24]/90 text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40 backdrop-blur-md">
                     1. Discover Assets
                   </span>
                 </div>
@@ -319,16 +319,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
             </div>
 
             {/* Card 2 */}
-            <div className="rounded-xl overflow-hidden bg-[#251D18] border border-[#C6A15B]/30 flex flex-col group shadow-lg">
+            <div className="rounded-2xl overflow-hidden glass-panel glass-card-interactive flex flex-col group shadow-xl">
               <div className="h-48 overflow-hidden relative">
                 <img
                   src={IMAGES.archive}
                   alt="Preserve Records"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#251D18] via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#201814] via-transparent to-transparent"></div>
                 <div className="absolute bottom-3 left-4">
-                  <span className="px-2.5 py-1 rounded bg-[#5B1F24] text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#5B1F24]/90 text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40 backdrop-blur-md">
                     2. Preserve Records
                   </span>
                 </div>
@@ -348,16 +348,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate, onSelectSa
             </div>
 
             {/* Card 3 */}
-            <div className="rounded-xl overflow-hidden bg-[#251D18] border border-[#C6A15B]/30 flex flex-col group shadow-lg">
+            <div className="rounded-2xl overflow-hidden glass-panel glass-card-interactive flex flex-col group shadow-xl">
               <div className="h-48 overflow-hidden relative">
                 <img
                   src={IMAGES.nightCta}
                   alt="Verify in the Field"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 filter brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#251D18] via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#201814] via-transparent to-transparent"></div>
                 <div className="absolute bottom-3 left-4">
-                  <span className="px-2.5 py-1 rounded bg-[#5B1F24] text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40">
+                  <span className="px-2.5 py-1 rounded-lg bg-[#5B1F24]/90 text-[#C6A15B] text-xs font-bold uppercase tracking-wider border border-[#C6A15B]/40 backdrop-blur-md">
                     3. Verify in the Field
                   </span>
                 </div>

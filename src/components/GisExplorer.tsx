@@ -44,8 +44,9 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
   const [selectedVerificationStatus, setSelectedVerificationStatus] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Map Controls
-  const [basemap, setBasemap] = useState<'satellite' | 'streets' | 'dark'>('satellite');
+  // Map Controls - Satellite + Labels is the required initial default
+  const [basemap, setBasemap] = useState<'satellite_labels' | 'satellite' | 'streets'>('satellite_labels');
+  const [tileNotice, setTileNotice] = useState<string | null>(null);
   const [polygonOpacity, setPolygonOpacity] = useState<number>(55);
   const [sidebarTab, setSidebarTab] = useState<'list' | 'detail'>('list');
 
@@ -159,39 +160,83 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     };
   }, []);
 
-  // Update Basemap Layer
+  // Update Basemap Layer — Three options with Satellite + Labels as default
   useEffect(() => {
     const map = mapInstanceRef.current;
     if (!map) return;
 
-    // Remove existing tile layers
+    // Remove existing tile layers while strictly preserving GeoJSON polygons and markers
     map.eachLayer((layer) => {
       if (layer instanceof L.TileLayer) {
         map.removeLayer(layer);
       }
     });
 
-    let tileUrl = '';
-    let attribution = '';
+    setTileNotice(null);
 
-    if (basemap === 'satellite') {
-      // Esri World Imagery
-      tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-      attribution = 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
-    } else if (basemap === 'streets') {
-      // OpenStreetMap
-      tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-      attribution = '© OpenStreetMap contributors';
+    if (basemap === 'satellite_labels') {
+      // 1. Satellite + Labels (Default)
+      // Base Satellite Imagery (Esri World Imagery)
+      const baseImagery = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+          maxZoom: 19,
+        }
+      );
+
+      // Reference Places & Boundaries Overlay (Labels rendered above imagery)
+      const referenceLabels = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: 'Labels &copy; Esri',
+          maxZoom: 19,
+        }
+      );
+
+      baseImagery.on('tileerror', () => {
+        setTileNotice('Satellite imagery tile server latency. Reconnecting to primary imagery cache; parcel geometries remain intact.');
+      });
+      baseImagery.on('tileload', () => {
+        setTileNotice(null);
+      });
+
+      baseImagery.addTo(map);
+      referenceLabels.addTo(map);
+    } else if (basemap === 'satellite') {
+      // 2. Satellite (Imagery only — no reference labels overlay)
+      const baseImagery = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        {
+          attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+          maxZoom: 19,
+        }
+      );
+
+      baseImagery.on('tileerror', () => {
+        setTileNotice('Satellite imagery tile server latency. Reconnecting to primary imagery cache; parcel geometries remain intact.');
+      });
+      baseImagery.on('tileload', () => {
+        setTileNotice(null);
+      });
+
+      baseImagery.addTo(map);
     } else {
-      // CartoDB Dark Matter
-      tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
-      attribution = '© OpenStreetMap, © CARTO';
-    }
+      // 3. Street Map (OpenStreetMap)
+      const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      });
 
-    L.tileLayer(tileUrl, {
-      attribution,
-      maxZoom: 19,
-    }).addTo(map);
+      streetLayer.on('tileerror', () => {
+        setTileNotice('Street map tile server response delayed. Retrying connection; parcel geometries remain intact.');
+      });
+      streetLayer.on('tileload', () => {
+        setTileNotice(null);
+      });
+
+      streetLayer.addTo(map);
+    }
   }, [basemap]);
 
   // Update GeoJSON Polygons on Map
@@ -436,39 +481,67 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
           <div ref={mapContainerRef} className="w-full h-full" />
 
           {/* Floating Map Controls Panel (Basemap + Opacity) */}
-          <div className="absolute top-4 right-4 z-[400] bg-[#251D18]/90 backdrop-blur-md p-3 rounded-lg border border-[#C6A15B]/40 shadow-xl space-y-3 max-w-[220px]">
-            <div className="flex items-center gap-1.5 text-xs font-bold text-[#C6A15B] uppercase border-b border-[#C6A15B]/20 pb-1.5">
-              <Layers className="w-3.5 h-3.5" />
-              <span>Map Layers</span>
+          <div className="absolute top-4 right-4 z-[400] bg-[#251D18]/90 backdrop-blur-md p-3.5 rounded-xl border border-[#C6A15B]/40 shadow-2xl space-y-3 w-64 max-w-[calc(100vw-2rem)]">
+            <div className="flex items-center justify-between text-xs font-bold text-[#C6A15B] uppercase border-b border-[#C6A15B]/20 pb-1.5">
+              <div className="flex items-center gap-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                <span>GIS Basemap</span>
+              </div>
+              <span className="text-[9px] font-mono text-[#D8C5A3]/60">WGS84</span>
             </div>
 
-            {/* Basemap Switch */}
-            <div className="grid grid-cols-3 gap-1 text-[10px]">
+            {/* Basemap Switch — 3 Required Options */}
+            <div className="flex flex-col gap-1.5 text-xs">
               <button
+                type="button"
+                onClick={() => setBasemap('satellite_labels')}
+                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
+                  basemap === 'satellite_labels'
+                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
+                }`}
+              >
+                <span>Satellite + Labels</span>
+                {basemap === 'satellite_labels' && (
+                  <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#C6A15B] text-[#251D18]">
+                    Default
+                  </span>
+                )}
+              </button>
+
+              <button
+                type="button"
                 onClick={() => setBasemap('satellite')}
-                className={`py-1 rounded font-semibold transition-all ${
-                  basemap === 'satellite' ? 'bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/50' : 'bg-[#1c1511] text-[#D8C5A3]/70'
+                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
+                  basemap === 'satellite'
+                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
                 }`}
               >
-                Satellite
+                <span>Satellite</span>
+                <span className="text-[10px] text-[#D8C5A3]/50">No labels</span>
               </button>
+
               <button
+                type="button"
                 onClick={() => setBasemap('streets')}
-                className={`py-1 rounded font-semibold transition-all ${
-                  basemap === 'streets' ? 'bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/50' : 'bg-[#1c1511] text-[#D8C5A3]/70'
+                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
+                  basemap === 'streets'
+                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
                 }`}
               >
-                Streets
-              </button>
-              <button
-                onClick={() => setBasemap('dark')}
-                className={`py-1 rounded font-semibold transition-all ${
-                  basemap === 'dark' ? 'bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/50' : 'bg-[#1c1511] text-[#D8C5A3]/70'
-                }`}
-              >
-                Dark
+                <span>Street Map</span>
+                <span className="text-[10px] text-[#D8C5A3]/50">OpenStreetMap</span>
               </button>
             </div>
+
+            {/* Tile Error / Notice Advisory */}
+            {tileNotice && (
+              <div className="p-2 rounded bg-amber-950/80 border border-amber-600/40 text-[10px] text-amber-200 leading-snug">
+                {tileNotice}
+              </div>
+            )}
 
             {/* Polygon Opacity Slider */}
             <div className="space-y-1">

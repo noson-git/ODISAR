@@ -21,12 +21,14 @@ interface AdminDashboardProps {
   userRole: string;
   onSwitchRole: (role: string) => void;
   onSelectAsset?: (asset: AssetRecord) => void;
+  onLogout?: () => void;
 }
 
 export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   userRole,
   onSwitchRole,
   onSelectAsset,
+  onLogout,
 }) => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
@@ -121,22 +123,34 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             </p>
           </div>
 
-          {/* Role Simulation Switcher (Essential for judge testing!) */}
-          <div className="flex items-center gap-2 bg-[#201814] p-1.5 rounded-lg border border-[#C6A15B]/30 text-xs">
-            <span className="text-[#C6A15B] font-bold text-[10px] uppercase px-1">Active Role:</span>
-            {['Administrator', 'Reviewer', 'Data Entry Operator'].map((r) => (
+          {/* Role Simulation Switcher & Logout */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2 bg-[#201814] p-1.5 rounded-lg border border-[#C6A15B]/30 text-xs">
+              <span className="text-[#C6A15B] font-bold text-[10px] uppercase px-1">Active Role:</span>
+              {['Administrator', 'Reviewer', 'Data Entry Operator'].map((r) => (
+                <button
+                  key={r}
+                  onClick={() => onSwitchRole(r)}
+                  className={`px-3 py-1.5 rounded font-semibold transition-all ${
+                    userRole === r
+                      ? 'bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/50'
+                      : 'text-[#D8C5A3]/70 hover:text-white'
+                  }`}
+                >
+                  {r.split(' ')[0]}
+                </button>
+              ))}
+            </div>
+
+            {onLogout && (
               <button
-                key={r}
-                onClick={() => onSwitchRole(r)}
-                className={`px-3 py-1.5 rounded font-semibold transition-all ${
-                  userRole === r
-                    ? 'bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/50'
-                    : 'text-[#D8C5A3]/70 hover:text-white'
-                }`}
+                onClick={onLogout}
+                className="px-3.5 py-2 rounded-lg bg-[#5B1F24]/80 hover:bg-[#5B1F24] text-[#F1E5CC] border border-[#C6A15B]/40 text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                title="Log out of Administration Portal"
               >
-                {r.split(' ')[0]}
+                <span>Log Out</span>
               </button>
-            ))}
+            )}
           </div>
         </div>
 

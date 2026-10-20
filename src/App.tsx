@@ -7,6 +7,7 @@ import { PropertiesPage } from './components/PropertiesPage';
 import { FieldVerificationView } from './components/FieldVerificationView';
 import { HistoricalRecordsView } from './components/HistoricalRecordsView';
 import { AdminDashboard } from './components/AdminDashboard';
+import { AdminLoginPage } from './components/AdminLoginPage';
 import { AboutPage } from './components/AboutPage';
 import { AssetDetailModal } from './components/AssetDetailModal';
 import { GeminiIntelligenceModal } from './components/GeminiIntelligenceModal';
@@ -19,6 +20,7 @@ export default function App() {
   const [selectedAsset, setSelectedAsset] = useState<AssetRecord | null>(null);
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [userRole, setUserRole] = useState('Administrator');
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
 
   const handleNavigate = (view: 'home' | 'gis' | 'properties' | 'field-verification' | 'records' | 'about' | 'admin') => {
     setCurrentView(view);
@@ -35,9 +37,7 @@ export default function App() {
       <Navbar
         currentView={currentView}
         onNavigate={handleNavigate}
-        onOpenAiModal={() => setAiModalOpen(true)}
         userRole={userRole}
-        onSwitchRole={setUserRole}
       />
 
       {/* Main Content Area */}
@@ -74,11 +74,22 @@ export default function App() {
         {currentView === 'records' && <HistoricalRecordsView />}
 
         {currentView === 'admin' && (
-          <AdminDashboard
-            userRole={userRole}
-            onSwitchRole={setUserRole}
-            onSelectAsset={handleSelectAsset}
-          />
+          !isAdminLoggedIn ? (
+            <AdminLoginPage
+              onLogin={(role) => {
+                setUserRole(role);
+                setIsAdminLoggedIn(true);
+              }}
+              onNavigateHome={() => handleNavigate('home')}
+            />
+          ) : (
+            <AdminDashboard
+              userRole={userRole}
+              onSwitchRole={setUserRole}
+              onSelectAsset={handleSelectAsset}
+              onLogout={() => setIsAdminLoggedIn(false)}
+            />
+          )
         )}
 
         {currentView === 'about' && (
