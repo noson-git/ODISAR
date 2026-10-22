@@ -90,84 +90,85 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       {/* ========================================================= */}
       {/* SECTION 1: CINEMATIC TWO-COLUMN HERO                      */}
       {/* ========================================================= */}
-      <section className="relative min-h-[82vh] lg:min-h-[88vh] flex items-center px-4 sm:px-6 lg:px-8 py-16 lg:py-24 overflow-hidden border-b border-[#C6A15B]/20">
+      <section className="relative min-h-[84vh] lg:min-h-[90vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 lg:py-24 overflow-hidden border-b border-[#C6A15B]/25">
         {/* Cinematic Temple Background Artwork */}
         <div className="absolute inset-0 z-0">
           <img
             src={IMAGES.hero}
             alt="Majestic Kalinga Temple Sandstone Architecture in Odisha"
-            className="w-full h-full object-cover object-[70%_35%] lg:object-center transform scale-100 transition-transform duration-1000"
+            className="w-full h-full object-cover object-center transform scale-100 transition-transform duration-1000"
           />
-          {/* Balanced directional gradient scrim — high contrast on left text, vivid architecture on right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#140F0C] via-[#140F0C]/90 sm:via-[#140F0C]/80 lg:via-[#140F0C]/65 to-transparent"></div>
-          {/* Subtle bottom fade to seamlessly blend into content below */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#140F0C] via-transparent to-black/20"></div>
+          {/* Centered atmospheric scrim with antique temple shadow framing */}
+          <div className="absolute inset-0 bg-gradient-to-b from-[#140F0C]/85 via-[#140F0C]/75 to-[#140F0C]"></div>
+          <div className="absolute inset-0 bg-radial from-transparent via-[#140F0C]/60 to-[#140F0C]"></div>
         </div>
 
-        {/* Hero Content: Left-Aligned Editorial Composition */}
-        <div className="relative z-10 max-w-7xl mx-auto w-full">
-          <div className="max-w-2xl lg:max-w-3xl space-y-6 sm:space-y-7">
-            {/* Eyebrow Label */}
-            <div className="inline-flex items-center gap-2.5 text-xs font-semibold tracking-widest uppercase text-[#C6A15B]">
-              <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
-              <span>Institutional Asset Intelligence</span>
-              <span className="w-10 h-[1px] bg-[#C6A15B]/50"></span>
-            </div>
+        {/* Hero Content: Centered Editorial Temple Heritage Composition */}
+        <div className="relative z-10 max-w-4xl mx-auto w-full text-center flex flex-col items-center space-y-6 sm:space-y-7">
+          {/* Eyebrow Label */}
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5B1F24]/80 border border-[#C6A15B]/40 text-[11px] sm:text-xs font-semibold tracking-widest uppercase text-[#C6A15B] shadow-sm backdrop-blur-sm">
+            <Sparkles className="w-3.5 h-3.5 text-[#C6A15B]" />
+            <span>Institutional Asset Intelligence · Odisha Heritage</span>
+          </div>
 
-            {/* Dominant Headline */}
-            <div className="space-y-3">
-              <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-[#FAF7F2] tracking-tight leading-[1.08] [text-wrap:balance]">
-                Every Asset.{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FAF7F2] via-[#F1E5CC] to-[#C6A15B]">
-                  One Connected View.
-                </span>
-              </h1>
-              <p className="font-odia text-base sm:text-lg text-[#D8C5A3]/80 font-medium">
-                ଓଡ଼ିଶା ଡିଜିଟାଲ୍ ତାଲିକା ଏବଂ ସ୍ଥାନିକ ସମ୍ପତ୍ତି ରେଜିଷ୍ଟ୍ରି
-              </p>
-            </div>
-
-            {/* Concise Supporting Description */}
-            <p className="text-base sm:text-lg text-[#D8C5A3]/90 font-sans leading-relaxed max-w-xl">
-              ODISAR unites fragmented paper revenue registers, scanned historical deeds, spatial parcel boundaries, and field verification into a single transparent asset registry. Built for endowments, religious trusts, and land administrators across Odisha.
+          {/* Odia Sacred Inscription Calligraphy */}
+          <div className="space-y-1.5">
+            <p className="font-odia text-xl sm:text-2xl lg:text-3xl text-[#C6A15B] font-semibold tracking-wide drop-shadow-[0_2px_10px_rgba(198,161,91,0.3)]">
+              ଓଡ଼ିଶା ଐତିହ୍ୟ ଭୂସମ୍ପତ୍ତି ସଂରକ୍ଷଣ ଓ ଡିଜିଟାଲ୍ ରେଜିଷ୍ଟ୍ରି
             </p>
+            <p className="text-xs sm:text-sm text-[#D8C5A3]/80 font-subheading italic tracking-wider">
+              Ekamra Kshetra &amp; Puri Dham Sacred Endowment Management
+            </p>
+          </div>
 
-            {/* Primary & Secondary Call to Actions */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
-              <button
-                onClick={() => onNavigate('gis')}
-                className="px-7 py-3.5 rounded-lg bg-[#C6A15B] hover:bg-[#d8b368] text-[#1E1713] font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-[0_4px_20px_rgba(198,161,91,0.3)] hover:shadow-[0_6px_25px_rgba(198,161,91,0.45)] active:scale-95 flex items-center justify-center gap-2 cursor-pointer group"
-              >
-                <Compass className="w-4 h-4 text-[#1E1713] group-hover:rotate-45 transition-transform" />
-                <span>Explore GIS Map</span>
-                <ArrowRight className="w-4 h-4 text-[#1E1713] group-hover:translate-x-1 transition-transform" />
-              </button>
+          {/* Dominant English Headline */}
+          <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-[#FAF7F2] tracking-tight leading-[1.08] [text-wrap:balance]">
+            Every Asset.{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FAF7F2] via-[#F1E5CC] to-[#C6A15B]">
+              One Connected View.
+            </span>
+          </h1>
 
-              <a
-                href="#how-it-works"
-                className="px-6 py-3.5 rounded-lg bg-[#251D18]/85 hover:bg-[#342720] text-[#F1E5CC] border border-[#C6A15B]/35 hover:border-[#C6A15B]/70 font-semibold text-xs sm:text-sm tracking-wider backdrop-blur-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span>Discover How It Works</span>
-              </a>
+          {/* Concise Supporting Description */}
+          <p className="text-sm sm:text-base lg:text-lg text-[#F1E5CC]/90 font-sans leading-relaxed max-w-2xl mx-auto">
+            ODISAR unites fragmented paper revenue registers, scanned historical deeds, spatial parcel boundaries, and field verification into a single transparent asset registry. Built for endowments, religious trusts, and land administrators across Odisha.
+          </p>
 
-              <button
-                onClick={() => setTourOpen(true)}
-                className="px-4 py-3.5 rounded-lg bg-transparent hover:bg-white/5 text-[#D8C5A3] border border-[#D8C5A3]/25 text-xs font-semibold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <Eye className="w-4 h-4 text-[#C6A15B]" />
-                <span>Platform Tour</span>
-              </button>
-            </div>
+          {/* Centered Primary & Secondary Call to Actions */}
+          <div className="flex flex-wrap items-center justify-center gap-3.5 pt-2">
+            <button
+              onClick={() => onNavigate('gis')}
+              className="px-7 py-3.5 rounded-lg bg-[#C6A15B] hover:bg-[#d8b368] text-[#1E1713] font-bold text-xs sm:text-sm tracking-wider uppercase transition-all shadow-[0_4px_20px_rgba(198,161,91,0.35)] hover:shadow-[0_6px_25px_rgba(198,161,91,0.5)] active:scale-95 flex items-center justify-center gap-2 cursor-pointer group"
+            >
+              <Compass className="w-4 h-4 text-[#1E1713] group-hover:rotate-45 transition-transform" />
+              <span>Explore GIS Map</span>
+              <ArrowRight className="w-4 h-4 text-[#1E1713] group-hover:translate-x-1 transition-transform" />
+            </button>
 
-            {/* Quiet Unboxed Trust Metadata */}
-            <div className="pt-4 border-t border-[#C6A15B]/20 flex flex-wrap items-center gap-y-2 gap-x-3 text-xs text-[#D8C5A3]/75 font-sans">
-              <span className="text-[#C6A15B] font-semibold">Key Institutions:</span>
-              <span>Lingaraj Temple Endowment</span>
-              <span aria-hidden="true" className="text-[#C6A15B]/40">·</span>
-              <span>Shree Jagannath Temple Administration</span>
-              <span aria-hidden="true" className="text-[#C6A15B]/40">·</span>
-              <span>Puri, Khordha &amp; Cuttack Cadastres</span>
-            </div>
+            <a
+              href="#how-it-works"
+              className="px-6 py-3.5 rounded-lg bg-[#251D18]/90 hover:bg-[#342720] text-[#F1E5CC] border border-[#C6A15B]/40 hover:border-[#C6A15B]/75 font-semibold text-xs sm:text-sm tracking-wider backdrop-blur-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Discover How It Works</span>
+            </a>
+
+            <button
+              onClick={() => setTourOpen(true)}
+              className="px-5 py-3.5 rounded-lg bg-[#5B1F24]/50 hover:bg-[#5B1F24]/80 text-[#D8C5A3] hover:text-[#F1E5CC] border border-[#C6A15B]/30 text-xs font-semibold tracking-wider uppercase transition-all flex items-center justify-center gap-1.5 cursor-pointer backdrop-blur-sm"
+            >
+              <Eye className="w-4 h-4 text-[#C6A15B]" />
+              <span>Platform Tour</span>
+            </button>
+          </div>
+
+          {/* Centered Trust Metadata Strip */}
+          <div className="pt-4 border-t border-[#C6A15B]/20 flex flex-wrap items-center justify-center gap-y-2 gap-x-3 text-xs text-[#D8C5A3]/75 font-sans">
+            <span className="text-[#C6A15B] font-semibold">Key Institutions:</span>
+            <span>Lingaraj Temple Endowment</span>
+            <span aria-hidden="true" className="text-[#C6A15B]/40">·</span>
+            <span>Shree Jagannath Temple Administration</span>
+            <span aria-hidden="true" className="text-[#C6A15B]/40">·</span>
+            <span>Puri, Khordha &amp; Cuttack Cadastres</span>
           </div>
         </div>
       </section>

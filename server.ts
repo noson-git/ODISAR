@@ -117,6 +117,7 @@ async function startServer() {
       const assets = rows.map((r) => ({
         ...r,
         geometry: JSON.parse(r.geometry_json),
+        cadastral_accuracy: r.cadastral_accuracy || (r.verification_status === 'Verified' ? 'Ground Verified Cadastre' : 'Illustrative Boundary'),
       }));
 
       res.json(assets);

@@ -17,9 +17,15 @@ import {
   FileText,
   RefreshCw,
   Info,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { AssetRecord, Institution } from '../types';
-import { demoInstitutions, demoAssets, DEMO_PROVENANCE_LABEL } from '../data/demoData';
+import { demoInstitutions, demoAssets, demoTempleSites, DEMO_PROVENANCE_LABEL } from '../data/demoData';
 import { generateSingleAssetPdf, generateRegistrySummaryPdf } from '../utils/pdfExport';
 import { sqMetersToUnits, validateGeoJsonPolygon } from '../utils/gis';
 
@@ -32,6 +38,7 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const geojsonLayerGroupRef = useRef<L.LayerGroup | null>(null);
+  const templeLayerGroupRef = useRef<L.LayerGroup | null>(null);
 
   // Data states
   const [institutions, setInstitutions] = useState<Institution[]>([]);
@@ -54,6 +61,12 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
   const [tileNotice, setTileNotice] = useState<string | null>(null);
   const [polygonOpacity, setPolygonOpacity] = useState<number>(55);
   const [sidebarTab, setSidebarTab] = useState<'list' | 'detail'>('list');
+
+  // Working minimize/expand states for basemap and right sidebar
+  const [basemapPanelCollapsed, setBasemapPanelCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showIllustrativeBoundaries, setShowIllustrativeBoundaries] = useState(true);
+  const [showTempleSanctums, setShowTempleSanctums] = useState(true);
 
   // Robust data loader with fallback to bundled demonstration dataset
   const loadData = async (isRetry = false) => {
@@ -195,12 +208,23 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
 
     mapInstanceRef.current = map;
     geojsonLayerGroupRef.current = L.layerGroup().addTo(map);
+    templeLayerGroupRef.current = L.layerGroup().addTo(map);
 
     return () => {
       map.remove();
       mapInstanceRef.current = null;
     };
   }, []);
+
+  // Handle automatic map resizing whenever sidebar is toggled or resized
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.invalidateSize();
+      }
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [sidebarCollapsed]);
 
   // Update Basemap Layer — Three options with Satellite + Labels as default
   useEffect(() => {
@@ -281,7 +305,59 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     }
   }, [basemap]);
 
-  // Update GeoJSON Polygons on Map
+  // Update Temple Sanctum Markers (distinct from dispersed agricultural/revenue properties)
+  useEffect(() => {
+    const map = mapInstanceRef.current;
+    const templeGroup = templeLayerGroupRef.current;
+    if (!map || !templeGroup) return;
+
+    templeGroup.clearLayers();
+
+    if (!showTempleSanctums) return;
+
+    demoTempleSites.forEach((site) => {
+      // Filter by institution context if selected
+      if (selectedInstId !== 'ALL' && site.institution_id !== selectedInstId) return;
+
+      const templeIcon = L.divIcon({
+        className: 'temple-sanctum-marker',
+        html: `
+          <div style="background: #5B1F24; border: 2px solid #C6A15B; color: #FAF7F2; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 12px rgba(198,161,91,0.7); font-size: 15px; cursor: pointer;">
+            🏛️
+          </div>
+        `,
+        iconSize: [30, 30],
+        iconAnchor: [15, 15],
+      });
+
+      const marker = L.marker([site.lat, site.lng], { icon: templeIcon });
+
+      const popupHtml = `
+        <div style="font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.4; max-width: 260px;">
+          <div style="font-weight: bold; color: #C6A15B; font-size: 13px; margin-bottom: 2px;">
+            ${site.name}
+          </div>
+          <div style="font-family: 'Noto Serif Oriya', serif; color: #FAF7F2; font-size: 12px; margin-bottom: 4px;">
+            ${site.name_odia}
+          </div>
+          <div style="padding: 2px 6px; display: inline-block; border-radius: 4px; background: rgba(91,31,36,0.6); color: #C6A15B; border: 1px solid rgba(198,161,91,0.4); font-size: 10px; font-weight: bold; margin-bottom: 6px;">
+            ${site.type}
+          </div>
+          <p style="margin: 0; color: #D8C5A3; font-size: 11px; line-height: 1.4;">
+            ${site.description}
+          </p>
+          <div style="margin-top: 6px; font-size: 10px; color: #C6A15B; font-style: italic;">
+            Main Sanctum location (Dispersed revenue parcels mapped across mouzas)
+          </div>
+        </div>
+      `;
+
+      marker.bindPopup(popupHtml);
+      templeGroup.addLayer(marker);
+    });
+  }, [showTempleSanctums, selectedInstId]);
+
+  // Update GeoJSON Polygons on Map with Verified vs Illustrative Boundary Distinction
   useEffect(() => {
     const map = mapInstanceRef.current;
     const layerGroup = geojsonLayerGroupRef.current;
@@ -294,6 +370,7 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     filteredAssets.forEach((asset) => {
       const color = getStatusColor(asset.verification_status);
       const isSelected = selectedAsset?.id === asset.id;
+      const isIllustrative = asset.cadastral_accuracy === 'Illustrative Boundary';
 
       try {
         const isPolygonValid = validateGeoJsonPolygon(asset.geometry);
@@ -311,18 +388,25 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
               <strong>Kisam:</strong> ${asset.kisam}<br/>
               <strong>Recorded Area:</strong> ${asset.recorded_area} ${asset.area_unit} (${asset.normalized_acres} Acres)
             </div>
-            <div style="margin-top: 6px; padding: 2px 6px; display: inline-block; border-radius: 4px; background: rgba(198,161,91,0.2); color: #F1E5CC; font-size: 10px; font-weight: bold;">
-              ${asset.verification_status}
+            <div style="margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap;">
+              <span style="padding: 2px 6px; border-radius: 4px; background: rgba(198,161,91,0.2); color: #F1E5CC; font-size: 10px; font-weight: bold;">
+                ${asset.verification_status}
+              </span>
+              <span style="padding: 2px 6px; border-radius: 4px; background: ${isIllustrative ? 'rgba(217,119,6,0.25)' : 'rgba(34,197,94,0.25)'}; color: ${isIllustrative ? '#fbbf24' : '#86efac'}; font-size: 9px; font-weight: bold; border: 1px solid ${isIllustrative ? 'rgba(217,119,6,0.5)' : 'rgba(34,197,94,0.5)'};">
+                ${isIllustrative ? 'Illustrative Boundary' : 'Ground Verified Cadastre'}
+              </span>
             </div>
           </div>
         `;
 
-        if (isPolygonValid) {
+        // Render polygon if valid AND either verified OR user enabled illustrative boundaries
+        if (isPolygonValid && (!isIllustrative || showIllustrativeBoundaries)) {
           const polygon = L.geoJSON(asset.geometry as any, {
             style: {
               color: isSelected ? '#ffffff' : color,
               weight: isSelected ? 3.5 : 2,
               opacity: 0.95,
+              dashArray: isIllustrative ? '6, 6' : undefined,
               fillColor: color,
               fillOpacity: polygonOpacity / 100,
             },
@@ -365,7 +449,7 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     if (filteredAssets.length > 0 && bounds.isValid() && !selectedAsset) {
       map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
     }
-  }, [filteredAssets, selectedAsset, polygonOpacity]);
+  }, [filteredAssets, selectedAsset, polygonOpacity, showIllustrativeBoundaries]);
 
   // Fit bounds or fly to selected asset on map
   const handleSelectAssetInList = (asset: AssetRecord) => {
@@ -608,101 +692,162 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
         <div className="flex-1 relative h-full">
           <div ref={mapContainerRef} className="w-full h-full" />
 
-          {/* Floating Map Controls Panel (Basemap + Opacity) */}
-          <div className="absolute top-4 right-4 z-[400] bg-[#251D18]/90 backdrop-blur-md p-3.5 rounded-xl border border-[#C6A15B]/40 shadow-2xl space-y-3 w-64 max-w-[calc(100vw-2rem)]">
-            <div className="flex items-center justify-between text-xs font-bold text-[#C6A15B] uppercase border-b border-[#C6A15B]/20 pb-1.5">
-              <div className="flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5" />
-                <span>GIS Basemap</span>
+          {/* Floating Map Controls Panel (Basemap + Opacity + Layer Toggles) */}
+          {basemapPanelCollapsed ? (
+            <button
+              onClick={() => setBasemapPanelCollapsed(false)}
+              className="absolute top-4 left-4 sm:left-auto sm:right-4 z-[400] bg-[#251D18]/95 backdrop-blur-md px-3 py-2 rounded-xl border border-[#C6A15B]/40 shadow-2xl flex items-center gap-2 text-xs font-semibold text-[#C6A15B] hover:text-[#FAF7F2] transition-all cursor-pointer group"
+              title="Expand GIS Basemap and Layer controls"
+            >
+              <Layers className="w-4 h-4 text-[#C6A15B] group-hover:rotate-12 transition-transform" />
+              <span>GIS Layers &amp; Opacity</span>
+              <ChevronDown className="w-3.5 h-3.5 text-[#C6A15B]" />
+            </button>
+          ) : (
+            <div className="absolute top-4 left-4 sm:left-auto sm:right-4 z-[400] bg-[#251D18]/95 backdrop-blur-md p-3.5 rounded-xl border border-[#C6A15B]/40 shadow-2xl space-y-3 w-72 max-w-[calc(100vw-2rem)]">
+              <div className="flex items-center justify-between text-xs font-bold text-[#C6A15B] uppercase border-b border-[#C6A15B]/20 pb-1.5">
+                <div className="flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>GIS Basemap &amp; Layers</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-[#D8C5A3]/60">WGS84</span>
+                  <button
+                    onClick={() => setBasemapPanelCollapsed(true)}
+                    className="p-1 rounded hover:bg-white/10 text-[#D8C5A3] hover:text-white transition-colors cursor-pointer"
+                    title="Minimize GIS controls"
+                    aria-label="Minimize GIS controls"
+                  >
+                    <ChevronUp className="w-3.5 h-3.5 text-[#C6A15B]" />
+                  </button>
+                </div>
               </div>
-              <span className="text-[9px] font-mono text-[#D8C5A3]/60">WGS84</span>
+
+              {/* Basemap Switch — 3 Required Options */}
+              <div className="flex flex-col gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setBasemap('satellite_labels')}
+                  className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border cursor-pointer ${
+                    basemap === 'satellite_labels'
+                      ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                      : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
+                  }`}
+                >
+                  <span>Satellite + Labels</span>
+                  {basemap === 'satellite_labels' && (
+                    <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#C6A15B] text-[#251D18]">
+                      Default
+                    </span>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBasemap('satellite')}
+                  className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border cursor-pointer ${
+                    basemap === 'satellite'
+                      ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                      : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
+                  }`}
+                >
+                  <span>Satellite (Clean)</span>
+                  <span className="text-[10px] text-[#D8C5A3]/50">No labels</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setBasemap('streets')}
+                  className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border cursor-pointer ${
+                    basemap === 'streets'
+                      ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
+                      : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
+                  }`}
+                >
+                  <span>Street Map</span>
+                  <span className="text-[10px] text-[#D8C5A3]/50">OpenStreetMap</span>
+                </button>
+              </div>
+
+              {/* Tile Error / Notice Advisory */}
+              {tileNotice && (
+                <div className="p-2 rounded bg-amber-950/80 border border-amber-600/40 text-[10px] text-amber-200 leading-snug">
+                  {tileNotice}
+                </div>
+              )}
+
+              {/* Polygon Opacity Slider */}
+              <div className="space-y-1">
+                <div className="flex justify-between text-[10px] text-[#D8C5A3]/80">
+                  <span>Parcel Fill Opacity:</span>
+                  <span className="font-bold text-[#C6A15B]">{polygonOpacity}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={polygonOpacity}
+                  onChange={(e) => setPolygonOpacity(Number(e.target.value))}
+                  className="w-full accent-[#C6A15B] cursor-pointer"
+                />
+              </div>
+
+              {/* Layer Visibility Toggles */}
+              <div className="space-y-1.5 pt-1.5 border-t border-[#C6A15B]/20 text-[11px]">
+                <label className="flex items-center justify-between cursor-pointer text-[#D8C5A3]">
+                  <span>Show Illustrative Boundaries</span>
+                  <input
+                    type="checkbox"
+                    checked={showIllustrativeBoundaries}
+                    onChange={(e) => setShowIllustrativeBoundaries(e.target.checked)}
+                    className="accent-[#C6A15B] cursor-pointer rounded"
+                  />
+                </label>
+                <label className="flex items-center justify-between cursor-pointer text-[#D8C5A3]">
+                  <span>Show Temple Sanctum Markers</span>
+                  <input
+                    type="checkbox"
+                    checked={showTempleSanctums}
+                    onChange={(e) => setShowTempleSanctums(e.target.checked)}
+                    className="accent-[#C6A15B] cursor-pointer rounded"
+                  />
+                </label>
+              </div>
+
+              {/* Legend */}
+              <div className="space-y-1 pt-1.5 border-t border-[#C6A15B]/20 text-[10px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#65745B]"></span>
+                  <span className="text-[#D8C5A3]">Verified Possession</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#C6A15B]"></span>
+                  <span className="text-[#D8C5A3]">Verification Pending</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#c026d3]"></span>
+                  <span className="text-[#D8C5A3]">Discrepancy Reported</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[11px] leading-none">🏛️</span>
+                  <span className="text-[#C6A15B] font-medium">Temple Sanctum (HQ)</span>
+                </div>
+              </div>
             </div>
+          )}
 
-            {/* Basemap Switch — 3 Required Options */}
-            <div className="flex flex-col gap-1.5 text-xs">
-              <button
-                type="button"
-                onClick={() => setBasemap('satellite_labels')}
-                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
-                  basemap === 'satellite_labels'
-                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
-                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
-                }`}
-              >
-                <span>Satellite + Labels</span>
-                {basemap === 'satellite_labels' && (
-                  <span className="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded bg-[#C6A15B] text-[#251D18]">
-                    Default
-                  </span>
-                )}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setBasemap('satellite')}
-                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
-                  basemap === 'satellite'
-                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
-                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
-                }`}
-              >
-                <span>Satellite</span>
-                <span className="text-[10px] text-[#D8C5A3]/50">No labels</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setBasemap('streets')}
-                className={`w-full py-2 px-2.5 rounded-lg font-medium text-left transition-all flex items-center justify-between border ${
-                  basemap === 'streets'
-                    ? 'bg-[#5B1F24] text-[#F1E5CC] border-[#C6A15B] shadow-sm font-semibold'
-                    : 'bg-[#1c1511] text-[#D8C5A3]/80 border-transparent hover:border-[#C6A15B]/30 hover:text-white'
-                }`}
-              >
-                <span>Street Map</span>
-                <span className="text-[10px] text-[#D8C5A3]/50">OpenStreetMap</span>
-              </button>
-            </div>
-
-            {/* Tile Error / Notice Advisory */}
-            {tileNotice && (
-              <div className="p-2 rounded bg-amber-950/80 border border-amber-600/40 text-[10px] text-amber-200 leading-snug">
-                {tileNotice}
-              </div>
-            )}
-
-            {/* Polygon Opacity Slider */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-[10px] text-[#D8C5A3]/80">
-                <span>Parcel Fill Opacity:</span>
-                <span className="font-bold text-[#C6A15B]">{polygonOpacity}%</span>
-              </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={polygonOpacity}
-                onChange={(e) => setPolygonOpacity(Number(e.target.value))}
-                className="w-full accent-[#C6A15B] cursor-pointer"
-              />
-            </div>
-
-            {/* Legend */}
-            <div className="space-y-1 pt-1 border-t border-[#C6A15B]/20 text-[10px]">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#65745B]"></span>
-                <span className="text-[#D8C5A3]">Verified Possession</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#C6A15B]"></span>
-                <span className="text-[#D8C5A3]">Verification Pending</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#c026d3]"></span>
-                <span className="text-[#D8C5A3]">Discrepancy Reported</span>
-              </div>
-            </div>
-          </div>
+          {/* Floating Expand Sidebar Button when Sidebar is minimized */}
+          {sidebarCollapsed && (
+            <button
+              onClick={() => setSidebarCollapsed(false)}
+              className="absolute bottom-6 right-4 z-[400] bg-[#5B1F24] hover:bg-[#72272e] text-[#F1E5CC] border border-[#C6A15B]/50 px-3.5 py-2.5 rounded-xl shadow-2xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+              title="Expand Parcel List & Inspector"
+            >
+              <Sliders className="w-4 h-4 text-[#C6A15B]" />
+              <span>Parcels ({filteredAssets.length}) &amp; Inspector</span>
+              <ChevronLeft className="w-4 h-4 text-[#C6A15B]" />
+            </button>
+          )}
 
           {/* Demonstration Notice Watermark */}
           <div className="absolute bottom-6 left-4 z-[400] bg-[#251D18]/90 backdrop-blur-md px-3 py-1.5 rounded border border-[#C6A15B]/40 text-[10px] text-[#D8C5A3] shadow-md max-w-sm pointer-events-none">
@@ -711,199 +856,242 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
           </div>
         </div>
 
-        {/* Right Sidebar (List or Detail Inspector) */}
-        <div className="w-full md:w-96 bg-[#201814] border-l border-[#C6A15B]/25 flex flex-col h-1/2 md:h-full shrink-0">
-          {/* Sidebar Tabs */}
-          <div className="flex border-b border-[#C6A15B]/20 bg-[#1c1511]">
-            <button
-              onClick={() => setSidebarTab('list')}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
-                sidebarTab === 'list'
-                  ? 'border-[#C6A15B] text-[#C6A15B] bg-[#251D18]'
-                  : 'border-transparent text-[#D8C5A3]/60 hover:text-white'
-              }`}
-            >
-              Parcels ({filteredAssets.length})
-            </button>
-            <button
-              onClick={() => setSidebarTab('detail')}
-              className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 ${
-                sidebarTab === 'detail'
-                  ? 'border-[#C6A15B] text-[#C6A15B] bg-[#251D18]'
-                  : 'border-transparent text-[#D8C5A3]/60 hover:text-white'
-              }`}
-            >
-              Inspector {selectedAsset ? `(${selectedAsset.id})` : ''}
-            </button>
-          </div>
+        {/* Right Sidebar (List or Detail Inspector) — Collapsible with seamless map resize */}
+        {!sidebarCollapsed && (
+          <div className="w-full md:w-96 bg-[#201814] border-l border-[#C6A15B]/25 flex flex-col h-1/2 md:h-full shrink-0 transition-all">
+            {/* Sidebar Tabs & Minimize Button */}
+            <div className="flex items-center border-b border-[#C6A15B]/20 bg-[#1c1511]">
+              <button
+                onClick={() => setSidebarTab('list')}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
+                  sidebarTab === 'list'
+                    ? 'border-[#C6A15B] text-[#C6A15B] bg-[#251D18]'
+                    : 'border-transparent text-[#D8C5A3]/60 hover:text-white'
+                }`}
+              >
+                Parcels ({filteredAssets.length})
+              </button>
+              <button
+                onClick={() => setSidebarTab('detail')}
+                className={`flex-1 py-2.5 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
+                  sidebarTab === 'detail'
+                    ? 'border-[#C6A15B] text-[#C6A15B] bg-[#251D18]'
+                    : 'border-transparent text-[#D8C5A3]/60 hover:text-white'
+                }`}
+              >
+                Inspector {selectedAsset ? `(${selectedAsset.id})` : ''}
+              </button>
+              <button
+                onClick={() => setSidebarCollapsed(true)}
+                className="px-2.5 py-2.5 text-[#D8C5A3]/70 hover:text-white hover:bg-white/5 transition-colors cursor-pointer border-l border-[#C6A15B]/20"
+                title="Minimize Parcel List & Inspector"
+                aria-label="Minimize Parcel List & Inspector"
+              >
+                <ChevronRight className="w-4 h-4 text-[#C6A15B]" />
+              </button>
+            </div>
 
-          {/* Sidebar Content */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {sidebarTab === 'list' ? (
-              <>
-                <div className="text-[11px] text-[#D8C5A3]/60 flex items-center justify-between pb-1">
-                  <span>Displaying matching parcels</span>
-                  <span className="text-[#C6A15B] font-semibold">{filteredAssets.length} found</span>
-                </div>
-
-                {filteredAssets.length === 0 ? (
-                  <div className="text-center py-10 space-y-2 text-xs text-[#D8C5A3]/60">
-                    <p>No parcels found matching the active filters.</p>
-                    <button
-                      onClick={handleResetFilters}
-                      className="text-[#C6A15B] underline cursor-pointer"
-                    >
-                      Clear all filters
-                    </button>
+            {/* Sidebar Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {sidebarTab === 'list' ? (
+                <>
+                  <div className="text-[11px] text-[#D8C5A3]/60 flex items-center justify-between pb-1">
+                    <span>Displaying matching parcels</span>
+                    <span className="text-[#C6A15B] font-semibold">{filteredAssets.length} found</span>
                   </div>
-                ) : (
-                  filteredAssets.map((asset) => {
-                    const isSelected = selectedAsset?.id === asset.id;
-                    const statusColor = getStatusColor(asset.verification_status);
-                    return (
-                      <div
-                        key={asset.id}
-                        onClick={() => handleSelectAssetInList(asset)}
-                        className={`p-3 rounded-lg border transition-all cursor-pointer space-y-1.5 ${
-                          isSelected
-                            ? 'bg-[#5B1F24]/40 border-[#C6A15B] shadow-md'
-                            : 'bg-[#251D18] border-[#C6A15B]/20 hover:border-[#C6A15B]/50 hover:bg-[#2b211a]'
+
+                  {filteredAssets.length === 0 ? (
+                    <div className="text-center py-10 space-y-2 text-xs text-[#D8C5A3]/60">
+                      <p>No parcels found matching the active filters.</p>
+                      <button
+                        onClick={handleResetFilters}
+                        className="text-[#C6A15B] underline cursor-pointer"
+                      >
+                        Clear all filters
+                      </button>
+                    </div>
+                  ) : (
+                    filteredAssets.map((asset) => {
+                      const isSelected = selectedAsset?.id === asset.id;
+                      const statusColor = getStatusColor(asset.verification_status);
+                      const isIllustrative = asset.cadastral_accuracy === 'Illustrative Boundary';
+                      return (
+                        <div
+                          key={asset.id}
+                          onClick={() => handleSelectAssetInList(asset)}
+                          className={`p-3 rounded-lg border transition-all cursor-pointer space-y-1.5 ${
+                            isSelected
+                              ? 'bg-[#5B1F24]/40 border-[#C6A15B] shadow-md'
+                              : 'bg-[#251D18] border-[#C6A15B]/20 hover:border-[#C6A15B]/50 hover:bg-[#2b211a]'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] font-mono font-bold text-[#C6A15B]">
+                              {asset.id}
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <span
+                                className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase"
+                                style={{
+                                  backgroundColor: `${statusColor}25`,
+                                  color: statusColor,
+                                  border: `1px solid ${statusColor}50`,
+                                }}
+                              >
+                                {asset.verification_status}
+                              </span>
+                              <span
+                                className={`text-[8px] px-1 py-0.5 rounded font-bold uppercase ${
+                                  isIllustrative
+                                    ? 'bg-amber-950/70 text-amber-300 border border-amber-600/40'
+                                    : 'bg-emerald-950/70 text-emerald-300 border border-emerald-600/40'
+                                }`}
+                              >
+                                {isIllustrative ? 'Illustrative' : 'Surveyed'}
+                              </span>
+                            </div>
+                          </div>
+
+                          <h4 className="font-heading text-xs font-bold text-white line-clamp-1">
+                            {asset.title}
+                          </h4>
+
+                          <div className="flex items-center justify-between text-[11px] text-[#D8C5A3]/80">
+                            <span>
+                              {asset.mouza}, {asset.district}
+                            </span>
+                            <span className="font-medium text-[#C6A15B]">
+                              {asset.recorded_area} {asset.area_unit}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center justify-between text-[10px] text-[#D8C5A3]/60 border-t border-[#C6A15B]/10 pt-1">
+                            <span>Plot: {asset.plot_no} | Khata: {asset.khata_no}</span>
+                            <span className="italic">{asset.kisam.split(' ')[0]}</span>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </>
+              ) : selectedAsset ? (
+                /* Selected Asset Detail Inspector */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-[#C6A15B]/20 pb-2">
+                    <span className="text-xs font-bold text-[#C6A15B] uppercase tracking-wider">
+                      {selectedAsset.id}
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/40 font-semibold">
+                      {selectedAsset.asset_type}
+                    </span>
+                  </div>
+
+                  <div>
+                    <h3 className="font-heading text-base font-bold text-white">
+                      {selectedAsset.title}
+                    </h3>
+                    <p className="text-xs text-[#D8C5A3]/80 mt-0.5">
+                      Institution: <strong className="text-white">{selectedAsset.institution_id}</strong>
+                    </p>
+                  </div>
+
+                  {/* Cadastral Boundary Accuracy Badge */}
+                  <div className="p-2.5 rounded-lg bg-[#1c1511] border border-[#C6A15B]/25 text-xs space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] text-[#D8C5A3]/60 uppercase font-semibold">Cadastral Boundary</span>
+                      <span
+                        className={`text-[9px] px-2 py-0.5 rounded font-bold uppercase ${
+                          selectedAsset.cadastral_accuracy === 'Ground Verified Cadastre'
+                            ? 'bg-emerald-950/80 text-emerald-400 border border-emerald-600/40'
+                            : 'bg-amber-950/80 text-amber-300 border border-amber-600/40'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-mono font-bold text-[#C6A15B]">
-                            {asset.id}
-                          </span>
-                          <span
-                            className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase"
-                            style={{
-                              backgroundColor: `${statusColor}25`,
-                              color: statusColor,
-                              border: `1px solid ${statusColor}50`,
-                            }}
-                          >
-                            {asset.verification_status}
-                          </span>
-                        </div>
-
-                        <h4 className="font-heading text-xs font-bold text-white line-clamp-1">
-                          {asset.title}
-                        </h4>
-
-                        <div className="flex items-center justify-between text-[11px] text-[#D8C5A3]/80">
-                          <span>
-                            {asset.mouza}, {asset.district}
-                          </span>
-                          <span className="font-medium text-[#C6A15B]">
-                            {asset.recorded_area} {asset.area_unit}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between text-[10px] text-[#D8C5A3]/60 border-t border-[#C6A15B]/10 pt-1">
-                          <span>Plot: {asset.plot_no} | Khata: {asset.khata_no}</span>
-                          <span className="italic">{asset.kisam.split(' ')[0]}</span>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </>
-            ) : selectedAsset ? (
-              /* Selected Asset Detail Inspector */
-              <div className="space-y-4">
-                <div className="flex items-center justify-between border-b border-[#C6A15B]/20 pb-2">
-                  <span className="text-xs font-bold text-[#C6A15B] uppercase tracking-wider">
-                    {selectedAsset.id}
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-[#5B1F24] text-[#C6A15B] border border-[#C6A15B]/40 font-semibold">
-                    {selectedAsset.asset_type}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="font-heading text-base font-bold text-white">
-                    {selectedAsset.title}
-                  </h3>
-                  <p className="text-xs text-[#D8C5A3]/80 mt-0.5">
-                    Institution: <strong className="text-white">{selectedAsset.institution_id}</strong>
-                  </p>
-                </div>
-
-                {/* Cadastral Specs Card */}
-                <div className="p-3 rounded-lg bg-[#1c1511] border border-[#C6A15B]/20 space-y-2 text-xs">
-                  <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
-                    <span className="text-[#D8C5A3]/60">District / Tahasil:</span>
-                    <span className="font-medium text-white">{selectedAsset.district} / {selectedAsset.tahasil}</span>
+                        {selectedAsset.cadastral_accuracy || 'Illustrative Boundary'}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-[#D8C5A3]/70 leading-snug">
+                      {selectedAsset.cadastral_accuracy === 'Ground Verified Cadastre'
+                        ? 'Ground-verified against revenue settlement patta and physical boundary pillars.'
+                        : 'Demonstration boundary for OSFIC evaluation. Not legally determined; pending joint physical demarcation.'}
+                    </p>
                   </div>
-                  <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
-                    <span className="text-[#D8C5A3]/60">Mouza / Village:</span>
-                    <span className="font-medium text-white">{selectedAsset.mouza}</span>
+
+                  {/* Cadastral Specs Card */}
+                  <div className="p-3 rounded-lg bg-[#1c1511] border border-[#C6A15B]/20 space-y-2 text-xs">
+                    <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
+                      <span className="text-[#D8C5A3]/60">District / Tahasil:</span>
+                      <span className="font-medium text-white">{selectedAsset.district} / {selectedAsset.tahasil}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
+                      <span className="text-[#D8C5A3]/60">Mouza / Village:</span>
+                      <span className="font-medium text-white">{selectedAsset.mouza}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
+                      <span className="text-[#D8C5A3]/60">Khata / Plot No:</span>
+                      <span className="font-medium text-white">{selectedAsset.khata_no} / {selectedAsset.plot_no}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
+                      <span className="text-[#D8C5A3]/60">Kisam (Land Class):</span>
+                      <span className="font-medium text-[#C6A15B]">{selectedAsset.kisam}</span>
+                    </div>
+                    <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
+                      <span className="text-[#D8C5A3]/60">Recorded Area:</span>
+                      <span className="font-bold text-white">{selectedAsset.recorded_area} {selectedAsset.area_unit}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-[#D8C5A3]/60">Normalized Acreage:</span>
+                      <span className="font-bold text-[#C6A15B]">{selectedAsset.normalized_acres} Acres</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
-                    <span className="text-[#D8C5A3]/60">Khata / Plot No:</span>
-                    <span className="font-medium text-white">{selectedAsset.khata_no} / {selectedAsset.plot_no}</span>
+
+                  {/* Status Badges */}
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex justify-between items-center p-2 rounded bg-[#251D18] border border-[#C6A15B]/20">
+                      <span className="text-[#D8C5A3]/70">Field Status:</span>
+                      <span className="font-bold text-emerald-400">{selectedAsset.verification_status}</span>
+                    </div>
+                    <div className="flex justify-between items-center p-2 rounded bg-[#251D18] border border-[#C6A15B]/20">
+                      <span className="text-[#D8C5A3]/70">Review Status:</span>
+                      <span className="font-bold text-[#C6A15B]">{selectedAsset.review_status}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
-                    <span className="text-[#D8C5A3]/60">Kisam (Land Class):</span>
-                    <span className="font-medium text-[#C6A15B]">{selectedAsset.kisam}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-[#C6A15B]/10 pb-1">
-                    <span className="text-[#D8C5A3]/60">Recorded Area:</span>
-                    <span className="font-bold text-white">{selectedAsset.recorded_area} {selectedAsset.area_unit}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#D8C5A3]/60">Normalized Acreage:</span>
-                    <span className="font-bold text-[#C6A15B]">{selectedAsset.normalized_acres} Acres</span>
+
+                  {/* Notes */}
+                  {selectedAsset.notes && (
+                    <div className="p-2.5 rounded bg-[#1c1511] border border-[#C6A15B]/20 text-xs text-[#D8C5A3]/90">
+                      <span className="text-[10px] text-[#C6A15B] uppercase font-bold block mb-0.5">Notes</span>
+                      {selectedAsset.notes}
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="space-y-2 pt-2 border-t border-[#C6A15B]/20">
+                    <button
+                      onClick={() => onSelectAsset(selectedAsset)}
+                      className="w-full py-2.5 rounded-md bg-[#C6A15B] hover:brightness-110 text-[#251D18] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Open Full Asset Profile</span>
+                    </button>
+
+                    <button
+                      onClick={() => generateSingleAssetPdf(selectedAsset)}
+                      className="w-full py-2 rounded-md bg-[#5B1F24] hover:bg-[#72272e] text-[#F1E5CC] border border-[#C6A15B]/40 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <Download className="w-3.5 h-3.5 text-[#C6A15B]" />
+                      <span>Download PDF Dossier</span>
+                    </button>
                   </div>
                 </div>
-
-                {/* Status Badges */}
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between items-center p-2 rounded bg-[#251D18] border border-[#C6A15B]/20">
-                    <span className="text-[#D8C5A3]/70">Field Status:</span>
-                    <span className="font-bold text-emerald-400">{selectedAsset.verification_status}</span>
-                  </div>
-                  <div className="flex justify-between items-center p-2 rounded bg-[#251D18] border border-[#C6A15B]/20">
-                    <span className="text-[#D8C5A3]/70">Review Status:</span>
-                    <span className="font-bold text-[#C6A15B]">{selectedAsset.review_status}</span>
-                  </div>
+              ) : (
+                <div className="text-center py-12 text-xs text-[#D8C5A3]/60 space-y-2">
+                  <MapPin className="w-8 h-8 mx-auto text-[#C6A15B]/40" />
+                  <p>Click on any parcel on the map to inspect its cadastral record.</p>
                 </div>
-
-                {/* Notes */}
-                {selectedAsset.notes && (
-                  <div className="p-2.5 rounded bg-[#1c1511] border border-[#C6A15B]/20 text-xs text-[#D8C5A3]/90">
-                    <span className="text-[10px] text-[#C6A15B] uppercase font-bold block mb-0.5">Notes</span>
-                    {selectedAsset.notes}
-                  </div>
-                )}
-
-                {/* Actions */}
-                <div className="space-y-2 pt-2 border-t border-[#C6A15B]/20">
-                  <button
-                    onClick={() => onSelectAsset(selectedAsset)}
-                    className="w-full py-2.5 rounded-md bg-[#C6A15B] hover:brightness-110 text-[#251D18] text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                    <span>Open Full Asset Profile</span>
-                  </button>
-
-                  <button
-                    onClick={() => generateSingleAssetPdf(selectedAsset)}
-                    className="w-full py-2 rounded-md bg-[#5B1F24] hover:bg-[#72272e] text-[#F1E5CC] border border-[#C6A15B]/40 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer"
-                  >
-                    <Download className="w-3.5 h-3.5 text-[#C6A15B]" />
-                    <span>Download PDF Dossier</span>
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center py-12 text-xs text-[#D8C5A3]/60 space-y-2">
-                <MapPin className="w-8 h-8 mx-auto text-[#C6A15B]/40" />
-                <p>Click on any parcel on the map to inspect its cadastral record.</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

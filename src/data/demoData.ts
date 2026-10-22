@@ -38,6 +38,40 @@ export const demoInstitutions: Institution[] = [
   },
 ];
 
+export interface TempleSite {
+  id: string;
+  institution_id: string;
+  name: string;
+  name_odia: string;
+  lat: number;
+  lng: number;
+  type: 'Sanctum Sanctorum / Main Temple';
+  description: string;
+}
+
+export const demoTempleSites: TempleSite[] = [
+  {
+    id: 'SITE-LGR-TEMPLE',
+    institution_id: 'inst-lingaraj',
+    name: 'Lingaraj Temple Sanctum Sanctorum',
+    name_odia: 'ଶ୍ରୀ ଲିଙ୍ଗରାଜ ମନ୍ଦିର',
+    lat: 20.2382,
+    lng: 85.8338,
+    type: 'Sanctum Sanctorum / Main Temple',
+    description: '11th century temple compound dedicated to Lord Harihara in Ekamra Kshetra Old Town. Distinct from dispersed revenue agricultural lands.',
+  },
+  {
+    id: 'SITE-JGT-TEMPLE',
+    institution_id: 'inst-jagannath',
+    name: 'Shree Jagannath Temple Sanctum Sanctorum',
+    name_odia: 'ଶ୍ରୀ ଜଗନ୍ନାଥ ମନ୍ଦିର (ପୁରୀ ବଡ଼ଦେଉଳ)',
+    lat: 19.8049,
+    lng: 85.8179,
+    type: 'Sanctum Sanctorum / Main Temple',
+    description: '12th century Srimandir complex on Bada Danda in Puri Dham. Distinct from dispersed Amruta Manohi endowments across districts.',
+  },
+];
+
 export const demoAssets: AssetRecord[] = [
   {
     id: 'KHT-LGR-KHD-001',
@@ -69,6 +103,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verified',
     review_status: 'Published',
+    cadastral_accuracy: 'Ground Verified Cadastre',
     notes:
       'Consecrated floral orchard on dry land southwest of Lingaraj Temple, dedicated for flower offerings (Pushpa Seva) during Chandan Yatra.',
     created_at: '2026-10-15T09:00:00.000Z',
@@ -104,8 +139,9 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Discrepancy Reported',
     review_status: 'Needs Review',
+    cadastral_accuracy: 'Illustrative Boundary',
     notes:
-      'Reported concern — not legally determined. Field team noted unrecorded boundary fencing on eastern margin of dry pasture land.',
+      'Reported concern — not legally determined. Field team noted unrecorded boundary fencing on eastern margin of dry pasture land. Boundary shown illustratively pending joint survey.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-16T14:30:00.000Z',
   },
@@ -139,7 +175,8 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verification Pending',
     review_status: 'Approved',
-    notes: 'Paddy revenue on fertile dry land dedicated to Maha Shivaratri ghee lighting rituals.',
+    cadastral_accuracy: 'Illustrative Boundary',
+    notes: 'Paddy revenue on fertile dry land dedicated to Maha Shivaratri ghee lighting rituals. Approximate cadastral boundary pending final demarcation.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-17T11:00:00.000Z',
   },
@@ -173,6 +210,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verified',
     review_status: 'Published',
+    cadastral_accuracy: 'Ground Verified Cadastre',
     notes: 'Recorded in 1962 Tahasil register as Lingaraj Debottar property on dry agricultural plains.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-18T10:00:00.000Z',
@@ -207,6 +245,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verified',
     review_status: 'Published',
+    cadastral_accuracy: 'Ground Verified Cadastre',
     notes:
       'Part of historic Amruta Manohi coastal casuarina grove situated securely inland north of Marine Drive, dedicated for timber and temple firewood.',
     created_at: '2026-10-15T09:00:00.000Z',
@@ -242,6 +281,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Needs Further Review',
     review_status: 'Needs Review',
+    cadastral_accuracy: 'Illustrative Boundary',
     notes:
       'Reported concern — not legally determined. Dry land herbal garden requiring joint surveyor re-inspection with municipal authority.',
     created_at: '2026-10-15T09:00:00.000Z',
@@ -277,6 +317,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verified',
     review_status: 'Published',
+    cadastral_accuracy: 'Ground Verified Cadastre',
     notes:
       'Historical rest pavilion on dry urban land for pilgrims traveling along the Jagannath Sadak toward Puri Dham.',
     created_at: '2026-10-15T09:00:00.000Z',
@@ -312,7 +353,8 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verification Pending',
     review_status: 'Approved',
-    notes: 'Agricultural dry land historically leased for seasonal pulse cultivation.',
+    cadastral_accuracy: 'Illustrative Boundary',
+    notes: 'Agricultural dry land historically leased for seasonal pulse cultivation. Illustrative cadastral boundary.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-17T14:00:00.000Z',
   },
@@ -346,8 +388,9 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Discrepancy Reported',
     review_status: 'Needs Review',
+    cadastral_accuracy: 'Illustrative Boundary',
     notes:
-      'Reported concern — not legally determined. High-bank dry revenue land south of Mahanadi flood embankment requiring joint survey verification.',
+      'Reported concern — not legally determined. High-bank dry revenue land south of Mahanadi flood embankment within Bidanasi mouza; boundary shown illustratively pending joint survey verification.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-16T18:00:00.000Z',
   },
@@ -381,6 +424,7 @@ export const demoAssets: AssetRecord[] = [
     },
     verification_status: 'Verified',
     review_status: 'Published',
+    cadastral_accuracy: 'Ground Verified Cadastre',
     notes: 'Stone pavilion on dry sandstone ground used during Sitala Sasthi festivities.',
     created_at: '2026-10-15T09:00:00.000Z',
     updated_at: '2026-10-18T10:00:00.000Z',

@@ -250,6 +250,18 @@ export const AssetDetailModal: React.FC<AssetDetailModalProps> = ({
                       {asset.lat.toFixed(5)}°N, {asset.lng.toFixed(5)}°E
                     </span>
                   </div>
+                  <div className="flex justify-between py-1 border-b border-[#C6A15B]/10">
+                    <span className="text-[#D8C5A3]/70">Cadastral Boundary:</span>
+                    <span
+                      className={`font-semibold ${
+                        asset.cadastral_accuracy === 'Ground Verified Cadastre'
+                          ? 'text-emerald-400'
+                          : 'text-amber-400'
+                      }`}
+                    >
+                      {asset.cadastral_accuracy || 'Illustrative Boundary'}
+                    </span>
+                  </div>
                   <div className="flex justify-between py-1">
                     <span className="text-[#D8C5A3]/70">Spatial Coordinate Ref:</span>
                     <span className="font-mono text-[#D8C5A3]">WGS84 (EPSG:4326)</span>

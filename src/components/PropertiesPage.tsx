@@ -373,17 +373,28 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span
-                          className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
-                            asset.verification_status === 'Verified'
-                              ? 'bg-emerald-950 text-emerald-400 border border-emerald-600/30'
-                              : asset.verification_status === 'Discrepancy Reported'
-                              ? 'bg-rose-950 text-rose-300 border border-rose-600/30'
-                              : 'bg-amber-950 text-amber-300 border border-amber-600/30'
-                          }`}
-                        >
-                          {asset.verification_status}
-                        </span>
+                        <div className="flex flex-col gap-1 items-start">
+                          <span
+                            className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                              asset.verification_status === 'Verified'
+                                ? 'bg-emerald-950 text-emerald-400 border border-emerald-600/30'
+                                : asset.verification_status === 'Discrepancy Reported'
+                                ? 'bg-rose-950 text-rose-300 border border-rose-600/30'
+                                : 'bg-amber-950 text-amber-300 border border-amber-600/30'
+                            }`}
+                          >
+                            {asset.verification_status}
+                          </span>
+                          <span
+                            className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
+                              asset.cadastral_accuracy === 'Ground Verified Cadastre'
+                                ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-600/30'
+                                : 'bg-amber-950/60 text-amber-300 border border-amber-600/30'
+                            }`}
+                          >
+                            {asset.cadastral_accuracy || 'Illustrative Boundary'}
+                          </span>
+                        </div>
                       </td>
                       <td className="py-3.5 px-4 text-right">
                         <button

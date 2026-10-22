@@ -44,6 +44,7 @@ export interface AssetRecord {
   };
   verification_status: VerificationStatus;
   review_status: ReviewStatus;
+  cadastral_accuracy?: 'Ground Verified Cadastre' | 'Illustrative Boundary';
   notes?: string;
   created_at: string;
   updated_at: string;

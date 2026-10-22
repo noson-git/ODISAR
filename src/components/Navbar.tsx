@@ -32,35 +32,19 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, onNavigate }) => {
     <header className="sticky top-0 z-50 w-full bg-[#140F0C]/85 backdrop-blur-md border-b border-[#C6A15B]/20 shadow-[0_4px_24px_rgba(0,0,0,0.4)] transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18">
-          {/* Brand Zone: Properly sized emblem + Wordmark + Subtitle */}
+          {/* Brand Zone: User-supplied ODISAR Logo with preserved proportions */}
           <div
-            className="flex items-center gap-3 cursor-pointer group"
+            className="flex items-center cursor-pointer group"
             onClick={() => handleLinkClick('home')}
             role="button"
             tabIndex={0}
             aria-label="ODISAR Homepage"
           >
-            {/* ODISAR Emblem Crop — preserving natural aspect ratio, no distorted square box */}
-            <div className="h-9 sm:h-10 flex items-center justify-center shrink-0">
-              <img
-                src={IMAGES.emblemTransparent}
-                alt="ODISAR Emblem"
-                className="h-full w-auto object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)] group-hover:scale-105 transition-transform"
-              />
-            </div>
-
-            <div className="flex flex-col justify-center">
-              <span className="flex items-center">
-                <img
-                  src={IMAGES.wordmarkTransparent}
-                  alt="ODISAR Logo"
-                  className="h-5 sm:h-6 w-auto object-contain filter brightness-125 contrast-125 drop-shadow-[0_1px_3px_rgba(198,161,91,0.35)] group-hover:brightness-150 transition-all"
-                />
-              </span>
-              <span className="text-[10px] sm:text-[11px] text-[#D8C5A3]/80 tracking-wide font-medium pt-1 hidden xs:block leading-none">
-                Odisha Digital Inventory &amp; Spatial Asset Registry
-              </span>
-            </div>
+            <img
+              src="/assets/aistudio/ODISAR_Heritage_Mapping_Logo__2__1fbb0f2c.png"
+              alt="ODISAR - Odisha Digital Inventory & Spatial Asset Registry"
+              className="h-10 sm:h-12 w-auto object-contain filter drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] group-hover:scale-[1.02] transition-transform"
+            />
           </div>
 
           {/* Right Navigation Links: Home · Explore GIS · Historical Records · Administration Login */}
