@@ -13,6 +13,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { AssetRecord, ObservationRecord } from '../types';
+import { demoAssets, demoObservations, DEMO_PROVENANCE_LABEL } from '../data/demoData';
 
 interface FieldVerificationViewProps {
   onNavigateToGis?: () => void;
@@ -22,6 +23,7 @@ export const FieldVerificationView: React.FC<FieldVerificationViewProps> = ({ on
   const [assets, setAssets] = useState<AssetRecord[]>([]);
   const [observations, setObservations] = useState<ObservationRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   // Form states
   const [selectedAssetId, setSelectedAssetId] = useState('');
@@ -42,18 +44,45 @@ export const FieldVerificationView: React.FC<FieldVerificationViewProps> = ({ on
     try {
       setLoading(true);
       const [aRes, oRes] = await Promise.all([
-        fetch('/api/assets'),
-        fetch('/api/observations'),
+        fetch('/api/assets').catch(() => null),
+        fetch('/api/observations').catch(() => null),
       ]);
-      const aData = await aRes.json();
-      const oData = await oRes.json();
-      setAssets(aData);
-      setObservations(oData);
-      if (aData.length > 0 && !selectedAssetId) {
-        setSelectedAssetId(aData[0].id);
+
+      let aData: AssetRecord[] | null = null;
+      let oData: ObservationRecord[] | null = null;
+
+      if (aRes && aRes.ok && aRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await aRes.json();
+        if (Array.isArray(parsed) && parsed.length > 0) aData = parsed;
+      }
+      if (oRes && oRes.ok && oRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await oRes.json();
+        if (Array.isArray(parsed) && parsed.length > 0) oData = parsed;
+      }
+
+      if (!aData || !oData) {
+        setIsDemoMode(true);
+        setAssets(demoAssets);
+        setObservations(demoObservations);
+        if (demoAssets.length > 0 && !selectedAssetId) {
+          setSelectedAssetId(demoAssets[0].id);
+        }
+      } else {
+        setIsDemoMode(false);
+        setAssets(aData);
+        setObservations(oData);
+        if (aData.length > 0 && !selectedAssetId) {
+          setSelectedAssetId(aData[0].id);
+        }
       }
     } catch (err) {
-      console.error('Failed to load observations:', err);
+      console.warn('[ODISAR] Observations API unavailable, falling back to demo records:', err);
+      setIsDemoMode(true);
+      setAssets(demoAssets);
+      setObservations(demoObservations);
+      if (demoAssets.length > 0 && !selectedAssetId) {
+        setSelectedAssetId(demoAssets[0].id);
+      }
     } finally {
       setLoading(false);
     }
@@ -93,6 +122,33 @@ export const FieldVerificationView: React.FC<FieldVerificationViewProps> = ({ on
     e.preventDefault();
     if (!selectedAssetId || !officerName || !notes.trim()) {
       setErrorMessage('Please select an asset and enter inspection observations.');
+      return;
+    }
+    if (isDemoMode) {
+      setSubmitting(true);
+      setTimeout(() => {
+        const newObs: ObservationRecord = {
+          id: `OBS-${Date.now().toString().slice(-4)}`,
+          asset_id: selectedAssetId,
+          officer_name: officerName,
+          gps_lat: gpsLat,
+          gps_lng: gpsLng,
+          accuracy_meters: accuracyMeters,
+          observation_date: new Date().toISOString().slice(0, 10),
+          discrepancy_category: discrepancyCategory,
+          notes,
+          photo_url: '/assets/photos/obs_kapileswar.jpg',
+          status: 'Submitted',
+          reviewer_comments: null,
+          created_at: new Date().toISOString(),
+        };
+        setObservations((prev) => [newObs, ...prev]);
+        setSuccessMessage(`Demo Mode: Observation ${newObs.id} logged locally in session memory. (Persistent write requires active Express backend).`);
+        setNotes('');
+        setGpsCaptured(false);
+        setSubmitting(false);
+        setTimeout(() => setSuccessMessage(''), 6000);
+      }, 500);
       return;
     }
 
@@ -149,6 +205,21 @@ export const FieldVerificationView: React.FC<FieldVerificationViewProps> = ({ on
             Submit geotagged field observations, verify boundary markers, and flag potential concerns for administrative review.
           </p>
         </div>
+
+        {/* Demo Mode Notice Banner */}
+        {isDemoMode && (
+          <div className="bg-[#5B1F24] border border-[#C6A15B]/40 rounded-xl px-5 py-3 text-xs flex flex-wrap items-center justify-between gap-3 text-[#F1E5CC] shadow-md">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-[#C6A15B] shrink-0" />
+              <span>
+                <strong className="text-white font-semibold">Demo Mode — Backend unavailable.</strong> Sample field observations loaded; submissions are stored locally in this session.
+              </span>
+            </div>
+            <span className="text-[11px] text-[#D8C5A3]/80 italic hidden md:inline">
+              {DEMO_PROVENANCE_LABEL}
+            </span>
+          </div>
+        )}
 
         {/* Notice on Discrepancies */}
         <div className="p-4 rounded-xl bg-[#5B1F24]/30 border border-[#C6A15B]/40 flex items-start gap-3">

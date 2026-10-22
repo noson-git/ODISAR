@@ -9,8 +9,11 @@ import {
   ArrowRight,
   Eye,
   RotateCcw,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { AssetRecord, Institution } from '../types';
+import { demoInstitutions, demoAssets, DEMO_PROVENANCE_LABEL } from '../data/demoData';
 import { generateRegistrySummaryPdf, generateSingleAssetPdf } from '../utils/pdfExport';
 
 interface PropertiesPageProps {
@@ -25,6 +28,8 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
   const [assets, setAssets] = useState<AssetRecord[]>([]);
   const [institutions, setInstitutions] = useState<Institution[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   // Filters
   const [selectedInstId, setSelectedInstId] = useState('ALL');
@@ -32,24 +37,57 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
   const [selectedStatus, setSelectedStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const [assetRes, instRes] = await Promise.all([
-          fetch('/api/assets'),
-          fetch('/api/institutions'),
-        ]);
+  const loadData = async (isRetry = false) => {
+    if (isRetry) setRetrying(true);
+    else setLoading(true);
+
+    let loadedAssets: AssetRecord[] | null = null;
+    let loadedInstitutions: Institution[] | null = null;
+    let fallbackNeeded = false;
+
+    try {
+      const [assetRes, instRes] = await Promise.all([
+        fetch('/api/assets').catch(() => null),
+        fetch('/api/institutions').catch(() => null),
+      ]);
+
+      if (assetRes && assetRes.ok && assetRes.headers.get('content-type')?.includes('application/json')) {
         const assetData = await assetRes.json();
-        const instData = await instRes.json();
-        setAssets(assetData);
-        setInstitutions(instData);
-      } catch (err) {
-        console.error('Failed to load assets:', err);
-      } finally {
-        setLoading(false);
+        if (Array.isArray(assetData) && assetData.length > 0) {
+          loadedAssets = assetData;
+        }
       }
+
+      if (instRes && instRes.ok && instRes.headers.get('content-type')?.includes('application/json')) {
+        const instData = await instRes.json();
+        if (Array.isArray(instData) && instData.length > 0) {
+          loadedInstitutions = instData;
+        }
+      }
+
+      if (!loadedAssets || !loadedInstitutions) {
+        fallbackNeeded = true;
+      }
+    } catch (err) {
+      console.warn('[ODISAR] Properties API unavailable, falling back to demo records:', err);
+      fallbackNeeded = true;
     }
+
+    if (fallbackNeeded || !loadedAssets || !loadedInstitutions) {
+      setAssets(demoAssets);
+      setInstitutions(demoInstitutions);
+      setIsDemoMode(true);
+    } else {
+      setAssets(loadedAssets);
+      setInstitutions(loadedInstitutions);
+      setIsDemoMode(false);
+    }
+
+    setLoading(false);
+    setRetrying(false);
+  };
+
+  useEffect(() => {
     loadData();
   }, []);
 
@@ -72,6 +110,59 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
     }
     return true;
   });
+
+  const handleExportCsv = () => {
+    if (!isDemoMode) {
+      window.open('/api/export/csv', '_blank');
+      return;
+    }
+    const headers = [
+      'ID',
+      'Title',
+      'Institution',
+      'District',
+      'Tahasil',
+      'Mouza',
+      'Khata No',
+      'Plot No',
+      'Kisam',
+      'Recorded Area',
+      'Area Unit',
+      'Normalized Acres',
+      'Latitude',
+      'Longitude',
+      'Verification Status',
+      'Review Status',
+    ];
+    const rows = filteredAssets.map((a) => [
+      `"${a.id}"`,
+      `"${a.title.replace(/"/g, '""')}"`,
+      `"${a.institution_id}"`,
+      `"${a.district}"`,
+      `"${a.tahasil}"`,
+      `"${a.mouza}"`,
+      `"${a.khata_no}"`,
+      `"${a.plot_no}"`,
+      `"${a.kisam.replace(/"/g, '""')}"`,
+      a.recorded_area,
+      `"${a.area_unit}"`,
+      a.normalized_acres,
+      a.lat,
+      a.lng,
+      `"${a.verification_status}"`,
+      `"${a.review_status}"`,
+    ]);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `odisar_registry_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="w-full min-h-[calc(100vh-80px)] bg-[#1A1411] text-[#F1E5CC] py-10 px-4 sm:px-6 lg:px-8">
@@ -104,14 +195,13 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
               <span>Download PDF Registry</span>
             </button>
 
-            <a
-              href="/api/export/csv"
-              download
+            <button
+              onClick={handleExportCsv}
               className="px-4 py-2.5 rounded-md bg-[#251D18] hover:bg-[#382b22] text-[#C6A15B] border border-[#C6A15B]/40 text-xs font-bold flex items-center gap-2 transition-all cursor-pointer"
             >
               <FileText className="w-4 h-4" />
               <span>Export CSV</span>
-            </a>
+            </button>
 
             <button
               onClick={onNavigateToGis}
@@ -122,6 +212,31 @@ export const PropertiesPage: React.FC<PropertiesPageProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Demo Mode Notice Banner */}
+        {isDemoMode && (
+          <div className="bg-[#5B1F24] border border-[#C6A15B]/40 rounded-xl px-5 py-3 text-xs flex flex-wrap items-center justify-between gap-3 text-[#F1E5CC] shadow-md">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-[#C6A15B] shrink-0" />
+              <span>
+                <strong className="text-white font-semibold">Demo Mode — Backend unavailable.</strong> Sample data only; changes are not synchronized to the server.
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[11px] text-[#D8C5A3]/80 italic hidden md:inline">
+                {DEMO_PROVENANCE_LABEL}
+              </span>
+              <button
+                onClick={() => loadData(true)}
+                disabled={retrying}
+                className="px-3 py-1 rounded bg-[#251D18] hover:bg-[#382b22] border border-[#C6A15B]/40 text-[#C6A15B] font-semibold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+              >
+                <RefreshCw className={`w-3 h-3 ${retrying ? 'animate-spin' : ''}`} />
+                <span>{retrying ? 'Connecting...' : 'Retry Connection'}</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Filter Controls */}
         <div className="p-4 rounded-xl bg-[#201814] border border-[#C6A15B]/25 flex flex-wrap items-center justify-between gap-4">

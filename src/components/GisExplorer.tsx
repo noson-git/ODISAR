@@ -15,10 +15,13 @@ import {
   AlertTriangle,
   CheckCircle2,
   FileText,
+  RefreshCw,
+  Info,
 } from 'lucide-react';
 import { AssetRecord, Institution } from '../types';
+import { demoInstitutions, demoAssets, DEMO_PROVENANCE_LABEL } from '../data/demoData';
 import { generateSingleAssetPdf, generateRegistrySummaryPdf } from '../utils/pdfExport';
-import { sqMetersToUnits } from '../utils/gis';
+import { sqMetersToUnits, validateGeoJsonPolygon } from '../utils/gis';
 
 interface GisExplorerProps {
   onSelectAsset: (asset: AssetRecord) => void;
@@ -35,6 +38,8 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
   const [assets, setAssets] = useState<AssetRecord[]>([]);
   const [selectedAsset, setSelectedAsset] = useState<AssetRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   // Independent Filters
   const [selectedInstId, setSelectedInstId] = useState<string>('ALL');
@@ -50,25 +55,62 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
   const [polygonOpacity, setPolygonOpacity] = useState<number>(55);
   const [sidebarTab, setSidebarTab] = useState<'list' | 'detail'>('list');
 
+  // Robust data loader with fallback to bundled demonstration dataset
+  const loadData = async (isRetry = false) => {
+    if (isRetry) {
+      setRetrying(true);
+    } else {
+      setLoading(true);
+    }
+
+    let loadedInstitutions: Institution[] | null = null;
+    let loadedAssets: AssetRecord[] | null = null;
+    let fallbackNeeded = false;
+
+    try {
+      const [instRes, assetRes] = await Promise.all([
+        fetch('/api/institutions').catch(() => null),
+        fetch('/api/assets').catch(() => null),
+      ]);
+
+      if (instRes && instRes.ok && instRes.headers.get('content-type')?.includes('application/json')) {
+        const instData = await instRes.json();
+        if (Array.isArray(instData) && instData.length > 0) {
+          loadedInstitutions = instData;
+        }
+      }
+
+      if (assetRes && assetRes.ok && assetRes.headers.get('content-type')?.includes('application/json')) {
+        const assetData = await assetRes.json();
+        if (Array.isArray(assetData) && assetData.length > 0) {
+          loadedAssets = assetData;
+        }
+      }
+
+      if (!loadedInstitutions || !loadedAssets) {
+        fallbackNeeded = true;
+      }
+    } catch (err) {
+      console.warn('[ODISAR] API unavailable, using bundled demonstration cadastre:', err);
+      fallbackNeeded = true;
+    }
+
+    if (fallbackNeeded || !loadedInstitutions || !loadedAssets) {
+      setInstitutions(demoInstitutions);
+      setAssets(demoAssets);
+      setIsDemoMode(true);
+    } else {
+      setInstitutions(loadedInstitutions);
+      setAssets(loadedAssets);
+      setIsDemoMode(false);
+    }
+
+    setLoading(false);
+    setRetrying(false);
+  };
+
   // Load initial data
   useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        const [instRes, assetRes] = await Promise.all([
-          fetch('/api/institutions'),
-          fetch('/api/assets'),
-        ]);
-        const instData = await instRes.json();
-        const assetData = await assetRes.json();
-        setInstitutions(instData);
-        setAssets(assetData);
-      } catch (err) {
-        console.error('Failed to load GIS data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
     loadData();
   }, []);
 
@@ -254,26 +296,8 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
       const isSelected = selectedAsset?.id === asset.id;
 
       try {
-        const polygon = L.geoJSON(asset.geometry as any, {
-          style: {
-            color: isSelected ? '#ffffff' : color,
-            weight: isSelected ? 3.5 : 2,
-            opacity: 0.95,
-            fillColor: color,
-            fillOpacity: polygonOpacity / 100,
-          },
-        });
+        const isPolygonValid = validateGeoJsonPolygon(asset.geometry);
 
-        // Add Marker at centroid
-        const marker = L.circleMarker([asset.lat, asset.lng], {
-          radius: 5,
-          color: '#F1E5CC',
-          fillColor: color,
-          fillOpacity: 1,
-          weight: 1.5,
-        });
-
-        // Tooltip & Popup
         const popupContent = `
           <div style="font-family: 'Inter', sans-serif; font-size: 12px; line-height: 1.4;">
             <div style="font-weight: bold; color: #C6A15B; font-size: 13px; margin-bottom: 2px;">
@@ -293,27 +317,46 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
           </div>
         `;
 
-        polygon.bindPopup(popupContent);
-        marker.bindPopup(popupContent);
-
-        polygon.on('click', () => {
-          setSelectedAsset(asset);
-          setSidebarTab('detail');
-        });
-        marker.on('click', () => {
-          setSelectedAsset(asset);
-          setSidebarTab('detail');
-        });
-
-        layerGroup.addLayer(polygon);
-        layerGroup.addLayer(marker);
-
-        // Extend bounds
-        if (asset.geometry.coordinates?.[0]) {
-          asset.geometry.coordinates[0].forEach(([lng, lat]) => {
-            bounds.extend([lat, lng]);
+        if (isPolygonValid) {
+          const polygon = L.geoJSON(asset.geometry as any, {
+            style: {
+              color: isSelected ? '#ffffff' : color,
+              weight: isSelected ? 3.5 : 2,
+              opacity: 0.95,
+              fillColor: color,
+              fillOpacity: polygonOpacity / 100,
+            },
           });
+
+          polygon.bindPopup(popupContent);
+          polygon.on('click', () => {
+            handleSelectAssetInList(asset);
+          });
+          layerGroup.addLayer(polygon);
+
+          if (asset.geometry.coordinates?.[0]) {
+            asset.geometry.coordinates[0].forEach(([lng, lat]) => {
+              bounds.extend([lat, lng]);
+            });
+          }
         }
+
+        // Add Marker at centroid (always displayed and clickable)
+        const marker = L.circleMarker([asset.lat, asset.lng], {
+          radius: isSelected ? 7 : 5,
+          color: isSelected ? '#ffffff' : '#F1E5CC',
+          fillColor: color,
+          fillOpacity: 1,
+          weight: isSelected ? 2.5 : 1.5,
+        });
+
+        marker.bindPopup(popupContent);
+        marker.on('click', () => {
+          handleSelectAssetInList(asset);
+        });
+
+        layerGroup.addLayer(marker);
+        bounds.extend([asset.lat, asset.lng]);
       } catch (err) {
         console.error('Failed to render parcel GeoJSON:', err);
       }
@@ -324,12 +367,22 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     }
   }, [filteredAssets, selectedAsset, polygonOpacity]);
 
-  // Fly to selected asset on map
+  // Fit bounds or fly to selected asset on map
   const handleSelectAssetInList = (asset: AssetRecord) => {
     setSelectedAsset(asset);
     setSidebarTab('detail');
     const map = mapInstanceRef.current;
     if (map) {
+      if (asset.geometry?.coordinates?.[0]?.length > 0) {
+        const polyBounds = L.latLngBounds([]);
+        asset.geometry.coordinates[0].forEach(([lng, lat]) => {
+          polyBounds.extend([lat, lng]);
+        });
+        if (polyBounds.isValid()) {
+          map.fitBounds(polyBounds, { padding: [60, 60], maxZoom: 17 });
+          return;
+        }
+      }
       map.flyTo([asset.lat, asset.lng], 16, { duration: 1.2 });
     }
   };
@@ -342,6 +395,56 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
     setSelectedVerificationStatus('ALL');
     setSearchQuery('');
     setSelectedAsset(null);
+  };
+
+  // Client-safe CSV download that works in Demo / static mode without 404
+  const handleExportCsv = () => {
+    const headers = [
+      'ID',
+      'Title',
+      'Institution',
+      'District',
+      'Tahasil',
+      'Mouza',
+      'Khata No',
+      'Plot No',
+      'Kisam',
+      'Recorded Area',
+      'Area Unit',
+      'Normalized Acres',
+      'Latitude',
+      'Longitude',
+      'Verification Status',
+      'Review Status',
+    ];
+    const rows = filteredAssets.map((a) => [
+      `"${a.id}"`,
+      `"${a.title.replace(/"/g, '""')}"`,
+      `"${a.institution_id}"`,
+      `"${a.district}"`,
+      `"${a.tahasil}"`,
+      `"${a.mouza}"`,
+      `"${a.khata_no}"`,
+      `"${a.plot_no}"`,
+      `"${a.kisam.replace(/"/g, '""')}"`,
+      a.recorded_area,
+      `"${a.area_unit}"`,
+      a.normalized_acres,
+      a.lat,
+      a.lng,
+      `"${a.verification_status}"`,
+      `"${a.review_status}"`,
+    ]);
+    const csvContent = '\uFEFF' + [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `odisar_parcels_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -461,18 +564,43 @@ export const GisExplorer: React.FC<GisExplorerProps> = ({ onSelectAsset, onNavig
               <span className="hidden sm:inline">Export PDF</span>
             </button>
 
-            <a
-              href="/api/export/csv"
-              download
-              className="px-2.5 py-1 rounded bg-[#251D18] text-[#C6A15B] border border-[#C6A15B]/40 hover:bg-[#352920] text-xs font-semibold flex items-center gap-1 transition-all"
+            <button
+              onClick={handleExportCsv}
+              className="px-2.5 py-1 rounded bg-[#251D18] text-[#C6A15B] border border-[#C6A15B]/40 hover:bg-[#352920] text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer"
               title="Download UTF-8 CSV with Odia script"
             >
               <FileText className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">CSV</span>
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Demo Mode Notice Banner — Displayed clearly when running offline or static */}
+      {isDemoMode && (
+        <div className="bg-[#5B1F24] border-b border-[#C6A15B]/40 px-4 py-2 text-xs flex flex-wrap items-center justify-between gap-2 text-[#F1E5CC] shrink-0 shadow-md">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 text-[#C6A15B] shrink-0" />
+            <span className="text-[12px]">
+              <strong className="text-white font-semibold">Demo Mode — Backend unavailable.</strong> Sample data only; changes are not synchronized to the server.
+            </span>
+          </div>
+          <div className="flex items-center gap-3 ml-auto">
+            <span className="text-[11px] text-[#D8C5A3]/80 italic hidden lg:inline">
+              {DEMO_PROVENANCE_LABEL}
+            </span>
+            <button
+              onClick={() => loadData(true)}
+              disabled={retrying}
+              className="px-3 py-1 rounded bg-[#251D18] hover:bg-[#382b22] border border-[#C6A15B]/40 text-[#C6A15B] font-semibold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+              title="Test connection to Express backend server"
+            >
+              <RefreshCw className={`w-3 h-3 ${retrying ? 'animate-spin text-[#C6A15B]' : 'text-[#C6A15B]'}`} />
+              <span>{retrying ? 'Connecting...' : 'Retry Connection'}</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Workspace (Map + Sidebar) */}
       <div className="flex-1 flex flex-col md:flex-row relative overflow-hidden">

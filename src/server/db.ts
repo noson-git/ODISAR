@@ -1,10 +1,19 @@
 /**
  * Persistent SQLite Database for ODISAR (Odisha Digital Inventory & Spatial Asset Registry)
  * Uses Node 22 native node:sqlite DatabaseSync
+ *
+ * Demonstrations seeded directly from shared authoritative src/data/demoData.ts module.
  */
 
 import { DatabaseSync } from 'node:sqlite';
 import path from 'path';
+import {
+  demoInstitutions,
+  demoAssets,
+  demoDocuments,
+  demoObservations,
+  demoAuditLogs,
+} from '../data/demoData.ts';
 
 const DB_PATH = path.resolve(process.cwd(), 'khetra.db');
 const db = new DatabaseSync(DB_PATH);
@@ -87,25 +96,17 @@ export function initDatabase() {
     );
   `);
 
-  // Check if institutions exist or if seed data needs coordinate accuracy correction
+  // Check if institutions exist
   const countRow = db.prepare('SELECT count(*) as count FROM institutions').get() as { count: number };
-  const sampleCoord = db.prepare('SELECT lat FROM assets WHERE id = ?').get('KHT-LGR-KHD-001') as { lat: number } | undefined;
 
-  // Re-seed if empty or if sample asset contains outdated coordinate (lat > 20.24 placed on water tank)
-  if (countRow.count === 0 || (sampleCoord && sampleCoord.lat > 20.24)) {
-    db.exec(`
-      DELETE FROM institutions;
-      DELETE FROM assets;
-      DELETE FROM documents;
-      DELETE FROM observations;
-      DELETE FROM audit_logs;
-    `);
+  // Seed database ONLY if empty (non-destructive; preserves any user modifications)
+  if (countRow.count === 0) {
     seedDatabase();
   }
 }
 
 function seedDatabase() {
-  console.log('[ODISAR] Seeding dry-land verified demonstration dataset into registry database...');
+  console.log('[ODISAR] Seeding verified demonstration dataset into registry database from shared demoData module...');
 
   // 1. Seed Institutions
   const insertInst = db.prepare(`
@@ -113,27 +114,19 @@ function seedDatabase() {
     VALUES (?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertInst.run(
-    'inst-lingaraj',
-    'Lingaraj Temple Endowment',
-    'ଶ୍ରୀ ଲିଙ୍ଗରାଜ ମନ୍ଦିର ପ୍ରଶାସନ',
-    'Ekamra Kshetra, Bhubaneswar',
-    'Khordha',
-    '11th Century CE (Somavamsi Dynasty)',
-    'Ancient Saivite-Vaishnavite endowment dedicated to Lord Harihara, managing hereditary consecrated lands across Khordha and Puri districts.'
-  );
+  for (const inst of demoInstitutions) {
+    insertInst.run(
+      inst.id,
+      inst.name,
+      inst.name_odia,
+      inst.headquarters,
+      inst.district,
+      inst.founded_era,
+      inst.description
+    );
+  }
 
-  insertInst.run(
-    'inst-jagannath',
-    'Shree Jagannath Temple Administration',
-    'ଶ୍ରୀ ଜଗନ୍ନାଥ ମନ୍ଦିର ପ୍ରଶାସନ (ପୁରୀ)',
-    'Sri Nahara, Grand Road, Puri',
-    'Puri',
-    '12th Century CE (Eastern Ganga Dynasty)',
-    'Apex endowment managing sacred properties (Amruta Manohi and Debottar lands) historically dedicated to Lord Jagannath across Puri, Khordha, and Cuttack.'
-  );
-
-  // 2. Seed Assets with 100% verified dry-land GeoJSON boundaries
+  // 2. Seed Assets
   const insertAsset = db.prepare(`
     INSERT INTO assets (
       id, title, institution_id, asset_type, district, tahasil, mouza,
@@ -143,333 +136,7 @@ function seedDatabase() {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  const now = new Date().toISOString();
-
-  // All 10 assets verified on dry land across revenue mouzas in Khordha, Puri, and Cuttack
-  const sampleAssets = [
-    {
-      id: 'KHT-LGR-KHD-001',
-      title: 'Bindusagar Parikrama Consecrated Orchard',
-      institution_id: 'inst-lingaraj',
-      asset_type: 'Land / Parcel',
-      district: 'Khordha',
-      tahasil: 'Bhubaneswar',
-      mouza: 'Old Town',
-      khata_no: '88/14',
-      plot_no: '402',
-      kisam: 'ବାଗାୟତ (Bagayat - Orchard)',
-      recorded_area: 45.0,
-      area_unit: 'Guntha',
-      normalized_acres: 1.8,
-      lat: 20.2372,
-      lng: 85.8318,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8308, 20.2362],
-            [85.8330, 20.2364],
-            [85.8328, 20.2382],
-            [85.8306, 20.2380],
-            [85.8308, 20.2362],
-          ],
-        ],
-      },
-      verification_status: 'Verified',
-      review_status: 'Published',
-      notes: 'Consecrated floral orchard on dry land southwest of Lingaraj Temple, dedicated for flower offerings (Pushpa Seva) during Chandan Yatra.',
-    },
-    {
-      id: 'KHT-LGR-KHD-002',
-      title: 'Kapileswar Sacred Dairy Pasture Land',
-      institution_id: 'inst-lingaraj',
-      asset_type: 'Land / Parcel',
-      district: 'Khordha',
-      tahasil: 'Bhubaneswar',
-      mouza: 'Kapileswar',
-      khata_no: '112/A',
-      plot_no: '715',
-      kisam: 'ଗୋଚର (Gochar - Grazing)',
-      recorded_area: 3.2,
-      area_unit: 'Mana',
-      normalized_acres: 3.2,
-      lat: 20.2265,
-      lng: 85.8245,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8228, 20.2250],
-            [85.8262, 20.2252],
-            [85.8260, 20.2280],
-            [85.8226, 20.2278],
-            [85.8228, 20.2250],
-          ],
-        ],
-      },
-      verification_status: 'Discrepancy Reported',
-      review_status: 'Needs Review',
-      notes: 'Reported concern — not legally determined. Field team noted unrecorded boundary fencing on eastern margin of dry pasture land.',
-    },
-    {
-      id: 'KHT-LGR-PRI-003',
-      title: 'Pipili Teisipur Agricultural Endowment',
-      institution_id: 'inst-lingaraj',
-      asset_type: 'Land / Parcel',
-      district: 'Puri',
-      tahasil: 'Pipili',
-      mouza: 'Teisipur',
-      khata_no: '304',
-      plot_no: '1182',
-      kisam: 'ଶାରଦ ଦୋଫସଲି (Sarada Dofasali - Double Crop Paddy)',
-      recorded_area: 5.5,
-      area_unit: 'Acre',
-      normalized_acres: 5.5,
-      lat: 20.1150,
-      lng: 85.8220,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8200, 20.1135],
-            [85.8240, 20.1137],
-            [85.8238, 20.1165],
-            [85.8198, 20.1162],
-            [85.8200, 20.1135],
-          ],
-        ],
-      },
-      verification_status: 'Verification Pending',
-      review_status: 'Approved',
-      notes: 'Paddy revenue on fertile dry land dedicated to Maha Shivaratri ghee lighting rituals.',
-    },
-    {
-      id: 'KHT-LGR-KHD-004',
-      title: 'Janla Paddy Holding (Jatani Tahasil)',
-      institution_id: 'inst-lingaraj',
-      asset_type: 'Land / Parcel',
-      district: 'Khordha',
-      tahasil: 'Jatani',
-      mouza: 'Janla',
-      khata_no: '52',
-      plot_no: '320',
-      kisam: 'ବାଜେଫସଲ (Bajefasali - Miscellaneous crop)',
-      recorded_area: 80.0,
-      area_unit: 'Guntha',
-      normalized_acres: 3.2,
-      lat: 20.2050,
-      lng: 85.7350,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.7330, 20.2035],
-            [85.7370, 20.2038],
-            [85.7368, 20.2065],
-            [85.7328, 20.2062],
-            [85.7330, 20.2035],
-          ],
-        ],
-      },
-      verification_status: 'Verified',
-      review_status: 'Published',
-      notes: 'Recorded in 1962 Tahasil register as Lingaraj Debottar property on dry agricultural plains.',
-    },
-    {
-      id: 'KHT-JGT-PRI-001',
-      title: 'Balukhanda Amruta Manohi Casuarina Grove',
-      institution_id: 'inst-jagannath',
-      asset_type: 'Land / Parcel',
-      district: 'Puri',
-      tahasil: 'Puri Sadar',
-      mouza: 'Balukhanda',
-      khata_no: '215/3',
-      plot_no: '984',
-      kisam: 'ଜଙ୍ଗଲ / ତୋଟା (Forest/Plantation)',
-      recorded_area: 12.4,
-      area_unit: 'Acre',
-      normalized_acres: 12.4,
-      lat: 19.8260,
-      lng: 85.8620,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8590, 19.8240],
-            [85.8650, 19.8245],
-            [85.8645, 19.8280],
-            [85.8585, 19.8275],
-            [85.8590, 19.8240],
-          ],
-        ],
-      },
-      verification_status: 'Verified',
-      review_status: 'Published',
-      notes: 'Part of historic Amruta Manohi coastal casuarina grove situated securely inland north of Marine Drive, dedicated for timber and temple firewood.',
-    },
-    {
-      id: 'KHT-JGT-PRI-002',
-      title: 'Kundheibenta Sacred Herbal Garden (Puri Town)',
-      institution_id: 'inst-jagannath',
-      asset_type: 'Land / Parcel',
-      district: 'Puri',
-      tahasil: 'Puri Sadar',
-      mouza: 'Kundheibenta',
-      khata_no: '44',
-      plot_no: '512',
-      kisam: 'ବାଗାୟତ (Bagayat - Sacred Flora)',
-      recorded_area: 2.1,
-      area_unit: 'Mana',
-      normalized_acres: 2.1,
-      lat: 19.8210,
-      lng: 85.8230,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8215, 19.8195],
-            [85.8245, 19.8198],
-            [85.8242, 19.8225],
-            [85.8212, 19.8222],
-            [85.8215, 19.8195],
-          ],
-        ],
-      },
-      verification_status: 'Needs Further Review',
-      review_status: 'Needs Review',
-      notes: 'Reported concern — not legally determined. Dry land herbal garden requiring joint surveyor re-inspection with municipal authority.',
-    },
-    {
-      id: 'KHT-JGT-KHD-003',
-      title: 'Nayapalli Pilgrimage Rest Shelter Site (Bhubaneswar)',
-      institution_id: 'inst-jagannath',
-      asset_type: 'Building / Structure',
-      district: 'Khordha',
-      tahasil: 'Bhubaneswar',
-      mouza: 'Nayapalli',
-      khata_no: '601',
-      plot_no: '1240',
-      kisam: 'ଘରବାରୀ (Gharabari - Homestead/Structure)',
-      recorded_area: 1.25,
-      area_unit: 'Acre',
-      normalized_acres: 1.25,
-      lat: 20.2980,
-      lng: 85.8150,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8135, 20.2965],
-            [85.8165, 20.2968],
-            [85.8162, 20.2995],
-            [85.8132, 20.2992],
-            [85.8135, 20.2965],
-          ],
-        ],
-      },
-      verification_status: 'Verified',
-      review_status: 'Published',
-      notes: 'Historical rest pavilion on dry urban land for pilgrims traveling along the Jagannath Sadak toward Puri Dham.',
-    },
-    {
-      id: 'KHT-JGT-KHD-004',
-      title: 'Khurda Road Railway Junction Depot Parcel',
-      institution_id: 'inst-jagannath',
-      asset_type: 'Land / Parcel',
-      district: 'Khordha',
-      tahasil: 'Jatani',
-      mouza: 'Khurda Road',
-      khata_no: '189',
-      plot_no: '76',
-      kisam: 'ବାଜେଫସଲ (Miscellaneous Holding)',
-      recorded_area: 50.0,
-      area_unit: 'Guntha',
-      normalized_acres: 2.0,
-      lat: 20.1580,
-      lng: 85.7120,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.7100, 20.1565],
-            [85.7140, 20.1568],
-            [85.7138, 20.1595],
-            [85.7098, 20.1592],
-            [85.7100, 20.1565],
-          ],
-        ],
-      },
-      verification_status: 'Verification Pending',
-      review_status: 'Approved',
-      notes: 'Agricultural dry land historically leased for seasonal pulse cultivation.',
-    },
-    {
-      id: 'KHT-JGT-CTC-005',
-      title: 'Bidanasi Agricultural & High-Bank Parcel (Cuttack)',
-      institution_id: 'inst-jagannath',
-      asset_type: 'Land / Parcel',
-      district: 'Cuttack',
-      tahasil: 'Cuttack Sadar',
-      mouza: 'Bidanasi',
-      khata_no: '409/2',
-      plot_no: '1820',
-      kisam: 'ଶାରଦ (Sarada Paddy)',
-      recorded_area: 4.8,
-      area_unit: 'Acre',
-      normalized_acres: 4.8,
-      lat: 20.4680,
-      lng: 85.8340,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8315, 20.4665],
-            [85.8365, 20.4668],
-            [85.8362, 20.4695],
-            [85.8312, 20.4692],
-            [85.8315, 20.4665],
-          ],
-        ],
-      },
-      verification_status: 'Discrepancy Reported',
-      review_status: 'Needs Review',
-      notes: 'Reported concern — not legally determined. High-bank dry revenue land south of Mahanadi flood embankment requiring joint survey verification.',
-    },
-    {
-      id: 'KHT-LGR-KHD-005',
-      title: 'Ekamra Kshetra Heritage Mandap Site',
-      institution_id: 'inst-lingaraj',
-      asset_type: 'Heritage Mandap',
-      district: 'Khordha',
-      tahasil: 'Bhubaneswar',
-      mouza: 'Old Town',
-      khata_no: '15',
-      plot_no: '88',
-      kisam: 'ଦେବସ୍ଥଳୀ (Devasthali - Sacred Site)',
-      recorded_area: 15.0,
-      area_unit: 'Guntha',
-      normalized_acres: 0.6,
-      lat: 20.2360,
-      lng: 85.8350,
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [85.8340, 20.2352],
-            [85.8360, 20.2353],
-            [85.8358, 20.2368],
-            [85.8338, 20.2367],
-            [85.8340, 20.2352],
-          ],
-        ],
-      },
-      verification_status: 'Verified',
-      review_status: 'Published',
-      notes: 'Stone pavilion on dry sandstone ground used during Sitala Sasthi festivities.',
-    },
-  ];
-
-  for (const a of sampleAssets) {
+  for (const a of demoAssets) {
     insertAsset.run(
       a.id,
       a.title,
@@ -489,13 +156,13 @@ function seedDatabase() {
       JSON.stringify(a.geometry),
       a.verification_status,
       a.review_status,
-      a.notes,
-      now,
-      now
+      a.notes || null,
+      a.created_at,
+      a.updated_at
     );
   }
 
-  // 3. Seed Sample Documents & OCR extraction records
+  // 3. Seed Historical Documents
   const insertDoc = db.prepare(`
     INSERT INTO documents (
       id, asset_id, title, doc_type, period_year, language, scan_url,
@@ -503,60 +170,21 @@ function seedDatabase() {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertDoc.run(
-    'DOC-1927-LGR-001',
-    'KHT-LGR-KHD-001',
-    '1927 Settlement Record of Rights (RoR Patta)',
-    'Record of Rights (RoR)',
-    '1927',
-    'Odia & English',
-    '/assets/scans/patta_1927_lgr.jpg',
-    'Human Verified',
-    JSON.stringify({
-      deity_name: 'ଶ୍ରୀ ଲିଙ୍ଗରାଜ ମହାପ୍ରଭୁ ବଜେ ଭୁବନେଶ୍ୱର',
-      institution_name: 'Lingaraj Temple',
-      district: 'Khordha',
-      tahasil: 'Bhubaneswar',
-      mouza: 'Old Town',
-      khata_no: '88/14',
-      plot_no: '402',
-      kisam: 'ବାଗାୟତ',
-      recorded_area: '45 Guntha',
-      confidence_score: 96.4,
-      extracted_at: '2026-10-18T10:00:00Z',
-      verified_by: 'Authorized Reviewer S. Mohapatra',
-    }),
-    'Approved',
-    now
-  );
-
-  insertDoc.run(
-    'DOC-1962-JGT-002',
-    'KHT-JGT-PRI-001',
-    '1962 Tahasil Debottar Land Grant Record',
-    'Revenue Grant Deed',
-    '1962',
-    'Odia & English',
-    '/assets/scans/deed_1962_jgt.jpg',
-    'Extracted',
-    JSON.stringify({
-      deity_name: 'ଶ୍ରୀ ଜଗନ୍ନାଥ ମହାପ୍ରଭୁ ବଜେ ପୁରୀ ଧାମ',
-      institution_name: 'Shree Jagannath Temple Administration',
-      district: 'Puri',
-      tahasil: 'Puri Sadar',
-      mouza: 'Balukhanda',
-      khata_no: '215/3',
-      plot_no: '984',
-      kisam: 'ତୋଟା / ଜଙ୍ଗଲ',
-      recorded_area: '12.40 Acre',
-      confidence_score: 89.2,
-      extracted_at: '2026-10-19T08:30:00Z',
-      verified_by: null,
-      flags: ['Tenant name blurred', 'Border crease on page 2'],
-    }),
-    'Pending',
-    now
-  );
+  for (const doc of demoDocuments) {
+    insertDoc.run(
+      doc.id,
+      doc.asset_id || null,
+      doc.title,
+      doc.doc_type,
+      doc.period_year,
+      doc.language,
+      doc.scan_url,
+      doc.ocr_status,
+      JSON.stringify(doc.ocr_data),
+      doc.review_status,
+      doc.created_at
+    );
+  }
 
   // 4. Seed Field Observations
   const insertObs = db.prepare(`
@@ -567,37 +195,23 @@ function seedDatabase() {
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
-  insertObs.run(
-    'OBS-2026-001',
-    'KHT-LGR-KHD-002',
-    'Inspector R. K. Nayak (Khordha Zone)',
-    20.2268,
-    85.8248,
-    3.8,
-    '2026-10-15',
-    'Boundary Discrepancy',
-    'Physical inspection confirmed traditional pasture boundaries are intact on North and South. Eastern boundary shows recent unapproved brick mortar alignment (approx 15 meters length).',
-    '/assets/photos/obs_kapileswar.jpg',
-    'Under Review',
-    'Scheduled joint physical tahasil boundary survey for Nov 2026.',
-    now
-  );
-
-  insertObs.run(
-    'OBS-2026-002',
-    'KHT-JGT-PRI-001',
-    'Field Officer D. Pradhan (Puri Coastal Sector)',
-    19.8262,
-    85.8622,
-    2.5,
-    '2026-10-17',
-    'Clear & Peaceful Possession',
-    'Casuarina and teak plantation grove inspected. Boundary pillars intact and verified matching 1962 cadastral survey lines.',
-    '/assets/photos/obs_balukhanda.jpg',
-    'Verified & Resolved',
-    'Approved by Assistant Commissioner of Endowments.',
-    now
-  );
+  for (const obs of demoObservations) {
+    insertObs.run(
+      obs.id,
+      obs.asset_id,
+      obs.officer_name,
+      obs.gps_lat,
+      obs.gps_lng,
+      obs.accuracy_meters,
+      obs.observation_date,
+      obs.discrepancy_category,
+      obs.notes,
+      obs.photo_url || null,
+      obs.status,
+      obs.reviewer_comments || null,
+      obs.created_at
+    );
+  }
 
   // 5. Seed Audit Logs
   const insertLog = db.prepare(`
@@ -605,24 +219,18 @@ function seedDatabase() {
     VALUES (?, ?, ?, ?, ?, ?)
   `);
 
-  insertLog.run(
-    'System Initializer',
-    'Administrator',
-    'SYSTEM_BOOTSTRAP',
-    'khetra.db',
-    'Initialized 10 verified dry-land demonstration asset parcels across Khordha, Puri, and Cuttack.',
-    now
-  );
-  insertLog.run(
-    'S. Mohapatra',
-    'Reviewer',
-    'OCR_VERIFICATION',
-    'DOC-1927-LGR-001',
-    'Verified Odia script transliteration for RoR Patta Khata 88/14 Plot 402.',
-    now
-  );
+  for (const log of demoAuditLogs) {
+    insertLog.run(
+      log.actor,
+      log.role,
+      log.action,
+      log.target_id,
+      log.summary,
+      log.timestamp
+    );
+  }
 
-  console.log('[ODISAR] Database initialized and seeded successfully with verified dry-land geometries.');
+  console.log('[ODISAR] Database initialized and seeded successfully with shared demo records.');
 }
 
 export { db };

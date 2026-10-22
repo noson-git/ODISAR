@@ -15,6 +15,13 @@ import {
   Search,
 } from 'lucide-react';
 import { DashboardStats, AuditLog, AssetRecord, ObservationRecord } from '../types';
+import {
+  demoAssets,
+  demoObservations,
+  demoAuditLogs,
+  getDemoDashboardStats,
+  DEMO_PROVENANCE_LABEL,
+} from '../data/demoData';
 import { generateRegistrySummaryPdf } from '../utils/pdfExport';
 
 interface AdminDashboardProps {
@@ -35,27 +42,60 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [pendingAssets, setPendingAssets] = useState<AssetRecord[]>([]);
   const [observations, setObservations] = useState<ObservationRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [activeQueueTab, setActiveQueueTab] = useState<'discrepancies' | 'approvals' | 'audit'>('discrepancies');
 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
       const [sRes, aRes, assRes, oRes] = await Promise.all([
-        fetch('/api/dashboard/stats'),
-        fetch('/api/audit-logs'),
-        fetch('/api/assets?reviewStatus=Needs Review'),
-        fetch('/api/observations'),
+        fetch('/api/dashboard/stats').catch(() => null),
+        fetch('/api/audit-logs').catch(() => null),
+        fetch('/api/assets?reviewStatus=Needs Review').catch(() => null),
+        fetch('/api/observations').catch(() => null),
       ]);
-      const sData = await sRes.json();
-      const aData = await aRes.json();
-      const assData = await assRes.json();
-      const oData = await oRes.json();
-      setStats(sData);
-      setAuditLogs(aData);
-      setPendingAssets(assData);
-      setObservations(oData);
+
+      let sData: DashboardStats | null = null;
+      let aData: AuditLog[] | null = null;
+      let assData: AssetRecord[] | null = null;
+      let oData: ObservationRecord[] | null = null;
+
+      if (sRes && sRes.ok && sRes.headers.get('content-type')?.includes('application/json')) {
+        sData = await sRes.json();
+      }
+      if (aRes && aRes.ok && aRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await aRes.json();
+        if (Array.isArray(parsed)) aData = parsed;
+      }
+      if (assRes && assRes.ok && assRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await assRes.json();
+        if (Array.isArray(parsed)) assData = parsed;
+      }
+      if (oRes && oRes.ok && oRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await oRes.json();
+        if (Array.isArray(parsed)) oData = parsed;
+      }
+
+      if (!sData || !aData || !assData || !oData) {
+        setIsDemoMode(true);
+        setStats(getDemoDashboardStats());
+        setAuditLogs(demoAuditLogs);
+        setPendingAssets(demoAssets.filter((a) => a.review_status === 'Needs Review'));
+        setObservations(demoObservations);
+      } else {
+        setIsDemoMode(false);
+        setStats(sData);
+        setAuditLogs(aData);
+        setPendingAssets(assData);
+        setObservations(oData);
+      }
     } catch (err) {
-      console.error('Failed to load admin stats:', err);
+      console.warn('[ODISAR] Admin stats API unavailable, falling back to demo records:', err);
+      setIsDemoMode(true);
+      setStats(getDemoDashboardStats());
+      setAuditLogs(demoAuditLogs);
+      setPendingAssets(demoAssets.filter((a) => a.review_status === 'Needs Review'));
+      setObservations(demoObservations);
     } finally {
       setLoading(false);
     }
@@ -66,6 +106,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   }, []);
 
   const handleApproveObservation = async (obsId: string) => {
+    if (isDemoMode) {
+      setObservations((prev) =>
+        prev.map((o) =>
+          o.id === obsId
+            ? { ...o, status: 'Verified & Resolved', reviewer_comments: `Approved by ${userRole} in local demonstration.` }
+            : o
+        )
+      );
+      return;
+    }
+
     try {
       const res = await fetch(`/api/observations/${obsId}/review`, {
         method: 'PUT',
@@ -84,6 +135,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   };
 
   const handleApproveAssetPublish = async (assetId: string) => {
+    if (isDemoMode) {
+      setPendingAssets((prev) => prev.filter((a) => a.id !== assetId));
+      return;
+    }
+
     try {
       const res = await fetch(`/api/assets/${assetId}`, {
         method: 'PUT',
@@ -153,6 +209,21 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             )}
           </div>
         </div>
+
+        {/* Demo Mode Notice Banner */}
+        {isDemoMode && (
+          <div className="bg-[#5B1F24] border border-[#C6A15B]/40 rounded-xl px-5 py-3 text-xs flex flex-wrap items-center justify-between gap-3 text-[#F1E5CC] shadow-md">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-[#C6A15B] shrink-0" />
+              <span>
+                <strong className="text-white font-semibold">Demo Mode — Backend unavailable.</strong> Administrative statistics and queues populated from demonstration cadastre; actions apply locally to this session.
+              </span>
+            </div>
+            <span className="text-[11px] text-[#D8C5A3]/80 italic hidden md:inline">
+              {DEMO_PROVENANCE_LABEL}
+            </span>
+          </div>
+        )}
 
         {/* Real Statistics Cards from SQLite */}
         {stats && (

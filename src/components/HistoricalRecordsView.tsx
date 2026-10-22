@@ -15,6 +15,7 @@ import {
   Save,
 } from 'lucide-react';
 import { DocumentRecord, AssetRecord } from '../types';
+import { demoDocuments, demoAssets, DEMO_PROVENANCE_LABEL } from '../data/demoData';
 import { IMAGES } from '../assets/images';
 
 export const HistoricalRecordsView: React.FC = () => {
@@ -22,6 +23,7 @@ export const HistoricalRecordsView: React.FC = () => {
   const [assets, setAssets] = useState<AssetRecord[]>([]);
   const [selectedDoc, setSelectedDoc] = useState<DocumentRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isDemoMode, setIsDemoMode] = useState(false);
 
   // Upload & Extraction form state
   const [uploadTitle, setUploadTitle] = useState('1962 Tahasil Debottar Revenue Register Patta');
@@ -46,22 +48,57 @@ export const HistoricalRecordsView: React.FC = () => {
     try {
       setLoading(true);
       const [dRes, aRes] = await Promise.all([
-        fetch('/api/documents'),
-        fetch('/api/assets'),
+        fetch('/api/documents').catch(() => null),
+        fetch('/api/assets').catch(() => null),
       ]);
-      const dData = await dRes.json();
-      const aData = await aRes.json();
-      setDocuments(dData);
-      setAssets(aData);
-      if (dData.length > 0 && !selectedDoc) {
-        setSelectedDoc(dData[0]);
-        setEditOcrData(dData[0].ocr_data);
+
+      let dData: DocumentRecord[] | null = null;
+      let aData: AssetRecord[] | null = null;
+
+      if (dRes && dRes.ok && dRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await dRes.json();
+        if (Array.isArray(parsed) && parsed.length > 0) dData = parsed;
       }
-      if (aData.length > 0 && !targetAssetId) {
-        setTargetAssetId(aData[0].id);
+      if (aRes && aRes.ok && aRes.headers.get('content-type')?.includes('application/json')) {
+        const parsed = await aRes.json();
+        if (Array.isArray(parsed) && parsed.length > 0) aData = parsed;
+      }
+
+      if (!dData || !aData) {
+        setIsDemoMode(true);
+        setDocuments(demoDocuments);
+        setAssets(demoAssets);
+        if (demoDocuments.length > 0 && !selectedDoc) {
+          setSelectedDoc(demoDocuments[0]);
+          setEditOcrData(demoDocuments[0].ocr_data);
+        }
+        if (demoAssets.length > 0 && !targetAssetId) {
+          setTargetAssetId(demoAssets[0].id);
+        }
+      } else {
+        setIsDemoMode(false);
+        setDocuments(dData);
+        setAssets(aData);
+        if (dData.length > 0 && !selectedDoc) {
+          setSelectedDoc(dData[0]);
+          setEditOcrData(dData[0].ocr_data);
+        }
+        if (aData.length > 0 && !targetAssetId) {
+          setTargetAssetId(aData[0].id);
+        }
       }
     } catch (err) {
-      console.error('Failed to load documents:', err);
+      console.warn('[ODISAR] Document API unavailable, falling back to demo records:', err);
+      setIsDemoMode(true);
+      setDocuments(demoDocuments);
+      setAssets(demoAssets);
+      if (demoDocuments.length > 0 && !selectedDoc) {
+        setSelectedDoc(demoDocuments[0]);
+        setEditOcrData(demoDocuments[0].ocr_data);
+      }
+      if (demoAssets.length > 0 && !targetAssetId) {
+        setTargetAssetId(demoAssets[0].id);
+      }
     } finally {
       setLoading(false);
     }
@@ -79,6 +116,46 @@ export const HistoricalRecordsView: React.FC = () => {
 
   const handleExtractOcr = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isDemoMode) {
+      setProcessingOcr(true);
+      setTimeout(() => {
+        const newDemoDoc: DocumentRecord = {
+          id: `DOC-${Date.now().toString().slice(-4)}-DEMO`,
+          asset_id: targetAssetId || 'KHT-LGR-KHD-001',
+          title: uploadTitle,
+          doc_type: docType,
+          period_year: periodYear,
+          language: 'Odia & English',
+          scan_url: '/assets/scans/ror_1927_lingaraj.jpg',
+          ocr_status: 'Extracted',
+          ocr_data: {
+            deity_name: 'ଶ୍ରୀ ଲିଙ୍ଗରାଜ ମହାପ୍ରଭୁ ବଜେ ଭୁବନେଶ୍ୱର',
+            institution_name: 'Lingaraj Temple Endowment',
+            district: 'Khordha',
+            tahasil: 'Bhubaneswar',
+            mouza: 'Old Town',
+            khata_no: '88/14',
+            plot_no: '402',
+            kisam: 'ବାଗାୟତ',
+            recorded_area: '45 Guntha',
+            confidence_score: 93.8,
+            extracted_at: new Date().toISOString(),
+            verified_by: null,
+            flags: ['Simulated extraction in demonstration mode'],
+          },
+          review_status: 'Pending',
+          created_at: new Date().toISOString(),
+        };
+        setDocuments((prev) => [newDemoDoc, ...prev]);
+        setSelectedDoc(newDemoDoc);
+        setEditOcrData(newDemoDoc.ocr_data);
+        setProcessingOcr(false);
+        setExtractSuccess('Demo Mode: OCR extracted and previewed locally for this session. (Database write requires active Express server).');
+        setTimeout(() => setExtractSuccess(''), 6000);
+      }, 700);
+      return;
+    }
+
     try {
       setProcessingOcr(true);
       setExtractSuccess('');
@@ -108,6 +185,25 @@ export const HistoricalRecordsView: React.FC = () => {
 
   const handleSaveVerification = async () => {
     if (!selectedDoc) return;
+    if (isDemoMode) {
+      setDocuments((prev) =>
+        prev.map((d) =>
+          d.id === selectedDoc.id
+            ? {
+                ...d,
+                ocr_data: editOcrData,
+                ocr_status: 'Human Verified',
+                review_status: 'Approved',
+              }
+            : d
+        )
+      );
+      setIsEditing(false);
+      setExtractSuccess('Demo Mode: Verification updated locally in session memory. (Permanent write requires active Express backend).');
+      setTimeout(() => setExtractSuccess(''), 6000);
+      return;
+    }
+
     try {
       setSavingVerification(true);
       const res = await fetch(`/api/documents/${selectedDoc.id}/verify`, {
@@ -152,6 +248,21 @@ export const HistoricalRecordsView: React.FC = () => {
             </p>
           </div>
         </div>
+
+        {/* Demo Mode Notice Banner */}
+        {isDemoMode && (
+          <div className="bg-[#5B1F24] border border-[#C6A15B]/40 rounded-xl px-5 py-3 text-xs flex flex-wrap items-center justify-between gap-3 text-[#F1E5CC] shadow-md">
+            <div className="flex items-center gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-[#C6A15B] shrink-0" />
+              <span>
+                <strong className="text-white font-semibold">Demo Mode — Backend unavailable.</strong> Sample historical documents loaded; modifications and OCR extraction run locally in this session.
+              </span>
+            </div>
+            <span className="text-[11px] text-[#D8C5A3]/80 italic hidden md:inline">
+              {DEMO_PROVENANCE_LABEL}
+            </span>
+          </div>
+        )}
 
         {/* Workflow Pipeline Progress Bar */}
         <div className="p-4 rounded-xl bg-[#201814] border border-[#C6A15B]/25 flex flex-wrap items-center justify-between gap-3 text-xs">
