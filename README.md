@@ -42,18 +42,7 @@ Developed in the **OSFIC 2026 (Odisha Startup & Innovation Challenges)** context
 
 ---
 
-## Getting Started
 
-```bash
-# Install dependencies
-npm install
-
-# Start full-stack development server (Express on port 3000 + Vite middleware)
-npm run dev
-
-# Production build
-npm run build
-```
 
 ---
 
